@@ -1,0 +1,195 @@
+.customer-dashboard {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.customer-header {
+  min-height: 72px;
+
+  padding: 0 6%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  h1 {
+    margin: 0;
+
+    font-size: 24px;
+    font-weight: 700;
+    color: #2563eb;
+  }
+}
+
+.customer-user {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  span {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  button {
+    border: none;
+    border-radius: 8px;
+
+    padding: 9px 16px;
+
+    background: #ef4444;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    &:hover {
+      background: #dc2626;
+    }
+  }
+}
+
+.customer-main {
+  width: 88%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 50px 0;
+}
+
+.welcome-section {
+  margin-bottom: 35px;
+
+  h2 {
+    margin-bottom: 8px;
+
+    font-size: 30px;
+    color: #111827;
+  }
+
+  p {
+    margin: 0;
+
+    color: #6b7280;
+    font-size: 15px;
+  }
+}
+
+.dashboard-cards {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 22px;
+}
+
+.dashboard-card {
+  display: flex;
+
+  gap: 20px;
+
+  padding: 28px;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.05);
+
+  .card-icon {
+    width: 50px;
+    height: 50px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+
+    color: #111827;
+  }
+
+  p {
+    margin: 0 0 18px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+  }
+
+  button {
+    padding: 9px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .customer-header {
+    padding: 0 20px;
+  }
+
+  .customer-user {
+    span {
+      display: none;
+    }
+  }
+
+  .customer-main {
+    width: calc(100% - 32px);
+
+    padding: 30px 0;
+  }
+
+  .welcome-section {
+    h2 {
+      font-size: 24px;
+    }
+  }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-card {
+    padding: 22px;
+  }
+}
