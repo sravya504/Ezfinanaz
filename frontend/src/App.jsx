@@ -20,10 +20,10 @@ function App() {
           element={<CustomerDashboard />}
         />
 
-        {/* <Route
+        <Route
           path="/admin/dashboard"
           element={<AdminDashboard />}
-        /> */}
+        />
 
       </Routes>
     </BrowserRouter>
