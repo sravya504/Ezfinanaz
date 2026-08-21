@@ -81,7 +81,7 @@ function VerifyPhone() {
 
       // TEMPORARY TESTING
       setMessage(
-        `OTP sent successfully. Your OTP is: ${response.data.otp}`
+        `OTP sent successfully`
       );
 
     } catch (error) {

@@ -3,8 +3,19 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { OAuth2Client } = require("google-auth-library");
 const crypto = require("crypto");
+const twilio = require("twilio");
+
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID
+);
+
+// ==========================================
+// TWILIO
+// ==========================================
+
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
 );
 
 // ==========================================
@@ -51,7 +62,6 @@ const register = async (req, res) => {
       phone,
       password: hashedPassword,
 
-      // KYC starts as incomplete
       kyc: {
         completed: false,
       },
@@ -66,6 +76,7 @@ const register = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+
         kycCompleted:
           user.kyc?.completed || false,
       },
@@ -148,9 +159,8 @@ const login = async (req, res) => {
         phone: user.phone,
         role: user.role,
 
-        // =====================================
-        // IMPORTANT
-        // =====================================
+        phoneVerified:
+          user.phoneVerified === true,
 
         kycCompleted:
           user.kyc?.completed === true,
@@ -169,8 +179,6 @@ const login = async (req, res) => {
   }
 };
 
-
-
 // ==========================================
 // GOOGLE LOGIN / SIGNUP
 // ==========================================
@@ -181,7 +189,8 @@ const googleLogin = async (req, res) => {
 
     if (!credential) {
       return res.status(400).json({
-        message: "Google credential is required",
+        message:
+          "Google credential is required",
       });
     }
 
@@ -189,12 +198,15 @@ const googleLogin = async (req, res) => {
     // VERIFY GOOGLE ID TOKEN
     // ==========================================
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    const ticket =
+      await googleClient.verifyIdToken({
+        idToken: credential,
+        audience:
+          process.env.GOOGLE_CLIENT_ID,
+      });
 
-    const payload = ticket.getPayload();
+    const payload =
+      ticket.getPayload();
 
     const {
       sub: googleId,
@@ -203,10 +215,10 @@ const googleLogin = async (req, res) => {
       email_verified,
     } = payload;
 
-    // Google must confirm the email
     if (!email || !email_verified) {
       return res.status(400).json({
-        message: "Google email is not verified",
+        message:
+          "Google email is not verified",
       });
     }
 
@@ -224,22 +236,20 @@ const googleLogin = async (req, res) => {
 
     if (!user) {
       user = await User.create({
-        fullName: name || "Google User",
+        fullName:
+          name || "Google User",
 
-        email: email.toLowerCase(),
+        email:
+          email.toLowerCase(),
 
-        googleId: googleId,
+        googleId,
 
-        // Google has verified the email
         emailVerified: true,
 
-        // Phone still needs OTP verification
         phoneVerified: false,
 
-        // Google users don't have a password
         password: undefined,
 
-        // KYC starts incomplete
         kyc: {
           completed: false,
         },
@@ -251,12 +261,10 @@ const googleLogin = async (req, res) => {
     // ==========================================
 
     else {
-      // Link Google account
       if (!user.googleId) {
         user.googleId = googleId;
       }
 
-      // Google verified this email
       user.emailVerified = true;
 
       await user.save();
@@ -282,7 +290,8 @@ const googleLogin = async (req, res) => {
     // ==========================================
 
     res.status(200).json({
-      message: "Google login successful",
+      message:
+        "Google login successful",
 
       token,
 
@@ -293,13 +302,11 @@ const googleLogin = async (req, res) => {
         phone: user.phone,
         role: user.role,
 
-        // Google email verification status
         emailVerified: true,
 
-        // Phone requires separate OTP
-        phoneVerified: user.phoneVerified,
+        phoneVerified:
+          user.phoneVerified === true,
 
-        // KYC status
         kycCompleted:
           user.kyc?.completed === true,
       },
@@ -312,11 +319,11 @@ const googleLogin = async (req, res) => {
     );
 
     res.status(401).json({
-      message: "Google authentication failed",
+      message:
+        "Google authentication failed",
     });
   }
 };
-
 
 // ==========================================
 // SEND PHONE OTP
@@ -324,9 +331,35 @@ const googleLogin = async (req, res) => {
 
 const sendPhoneOtp = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const {
+      userId,
+      phone,
+    } = req.body;
 
-    const user = await User.findById(userId);
+    // ==========================================
+    // VALIDATE INPUT
+    // ==========================================
+
+    if (!userId || !phone) {
+      return res.status(400).json({
+        message:
+          "User ID and phone number are required",
+      });
+    }
+
+    if (!/^\d{10}$/.test(phone)) {
+      return res.status(400).json({
+        message:
+          "Enter a valid 10-digit phone number",
+      });
+    }
+
+    // ==========================================
+    // FIND USER
+    // ==========================================
+
+    const user =
+      await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -334,40 +367,80 @@ const sendPhoneOtp = async (req, res) => {
       });
     }
 
+    // ==========================================
+    // SAVE PHONE NUMBER
+    // ==========================================
+
+    user.phone = phone;
+
+    // ==========================================
+    // GENERATE OTP
+    // ==========================================
+
     const otp = crypto
       .randomInt(100000, 1000000)
       .toString();
 
     user.phoneOtp = otp;
 
-    // OTP valid for 5 minutes
     user.phoneOtpExpires =
-      new Date(Date.now() + 5 * 60 * 1000);
+      new Date(
+        Date.now() +
+        5 * 60 * 1000
+      );
 
     await user.save();
 
-    // TEMPORARY:
-    // For testing, show OTP in backend console.
+    // ==========================================
+    // FORMAT INDIAN PHONE NUMBER
+    // ==========================================
+
+    const formattedPhone =
+      `+91${phone}`;
+
+    // ==========================================
+    // SEND SMS THROUGH TWILIO
+    // ==========================================
+
+    const twilioMessage =
+      await twilioClient.messages.create({
+        body:
+          `Your EZFINANZ verification OTP is ${otp}. It is valid for 5 minutes.`,
+
+        from:
+          process.env.TWILIO_PHONE_NUMBER,
+
+        to:
+          formattedPhone,
+      });
+
     console.log(
-      `PHONE OTP for ${user.phone}: ${otp}`
+      "OTP SMS sent successfully:",
+      twilioMessage.sid
     );
 
-    res.status(200).json({
-      message: "OTP sent successfully",
+    // ==========================================
+    // RESPONSE
+    // ==========================================
 
-      // REMOVE THIS IN PRODUCTION
-      otp,
+    return res.status(200).json({
+      message:
+        "OTP sent successfully",
     });
 
   } catch (error) {
-    console.error("Send OTP error:", error);
+    console.error(
+      "Send OTP error:",
+      error
+    );
 
-    res.status(500).json({
-      message: "Failed to send OTP",
+    return res.status(500).json({
+      message:
+        error.message ||
+        "Failed to send OTP",
     });
   }
 };
-
 
 // ==========================================
 // VERIFY PHONE OTP
@@ -380,7 +453,15 @@ const verifyPhoneOtp = async (req, res) => {
       otp,
     } = req.body;
 
-    const user = await User.findById(userId);
+    if (!userId || !otp) {
+      return res.status(400).json({
+        message:
+          "User ID and OTP are required",
+      });
+    }
+
+    const user =
+      await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -390,19 +471,24 @@ const verifyPhoneOtp = async (req, res) => {
 
     if (user.phoneVerified) {
       return res.status(400).json({
-        message: "Phone already verified",
-      });
-    }
-
-    if (!user.phoneOtp ||
-        !user.phoneOtpExpires) {
-      return res.status(400).json({
-        message: "Please request a new OTP",
+        message:
+          "Phone already verified",
       });
     }
 
     if (
-      new Date() > user.phoneOtpExpires
+      !user.phoneOtp ||
+      !user.phoneOtpExpires
+    ) {
+      return res.status(400).json({
+        message:
+          "Please request a new OTP",
+      });
+    }
+
+    if (
+      new Date() >
+      user.phoneOtpExpires
     ) {
       return res.status(400).json({
         message: "OTP expired",
@@ -415,18 +501,25 @@ const verifyPhoneOtp = async (req, res) => {
       });
     }
 
+    // ==========================================
     // SUCCESS
+    // ==========================================
+
     user.phoneVerified = true;
     user.phoneOtp = null;
     user.phoneOtpExpires = null;
 
     await user.save();
 
-    res.status(200).json({
-  message: "Phone verified successfully",
-  phoneVerified: true,
-  kycCompleted: user.kyc?.completed === true,
-});
+    return res.status(200).json({
+      message:
+        "Phone verified successfully",
+
+      phoneVerified: true,
+
+      kycCompleted:
+        user.kyc?.completed === true,
+    });
 
   } catch (error) {
     console.error(
@@ -434,11 +527,16 @@ const verifyPhoneOtp = async (req, res) => {
       error
     );
 
-    res.status(500).json({
-      message: "OTP verification failed",
+    return res.status(500).json({
+      message:
+        "OTP verification failed",
     });
   }
 };
+
+// ==========================================
+// EXPORT
+// ==========================================
 
 module.exports = {
   register,
