@@ -4,7 +4,7 @@ import axios from "axios";
 
 import "../style/signup.scss";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://ezfinanaz-backend1.onrender.com/";
 
 function Signup() {
   const navigate = useNavigate();
