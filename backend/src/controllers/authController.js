@@ -389,7 +389,7 @@ const sendPhoneOtp = async (req, res) => {
         5 * 60 * 1000
       );
 
-    await user.save();
+   
 
     // ==========================================
     // FORMAT INDIAN PHONE NUMBER
@@ -414,6 +414,8 @@ const sendPhoneOtp = async (req, res) => {
           formattedPhone,
       });
 
+       await user.save();
+
     console.log(
       "OTP SMS sent successfully:",
       twilioMessage.sid
@@ -429,10 +431,13 @@ const sendPhoneOtp = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(
-      "Send OTP error:",
-      error
-    );
+  console.error("========== SEND OTP ERROR ==========");
+  console.error("MESSAGE:", error.message);
+  console.error("CODE:", error.code);
+  console.error("STATUS:", error.status);
+  console.error("MORE INFO:", error.moreInfo);
+  console.error("STACK:", error.stack);
+  console.error("====================================");
 
     return res.status(500).json({
       message:

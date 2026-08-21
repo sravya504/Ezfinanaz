@@ -11,7 +11,7 @@ function VerifyPhone() {
   const navigate = useNavigate();
 
   // ==========================================
-  // GET USER
+  // GET USER FROM LOCAL STORAGE
   // ==========================================
 
   const storedUser = localStorage.getItem("user");
@@ -49,6 +49,7 @@ function VerifyPhone() {
     setError("");
     setMessage("");
 
+    // Check user
     if (!userId) {
       setError(
         "User information not found. Please login again."
@@ -56,9 +57,10 @@ function VerifyPhone() {
       return;
     }
 
-    if (!phone || phone.length < 10) {
+    // Check phone
+    if (!/^\d{10}$/.test(phone)) {
       setError(
-        "Please enter a valid phone number."
+        "Please enter a valid 10-digit phone number."
       );
       return;
     }
@@ -75,14 +77,18 @@ function VerifyPhone() {
       );
 
       console.log(
-        "Phone OTP:",
-        response.data.otp
+        "Send OTP response:",
+        response.data
       );
 
-      // TEMPORARY TESTING
+      // OTP is sent through Twilio.
+      // Do NOT display the OTP in the frontend.
       setMessage(
-        `OTP sent successfully`
+        "OTP sent successfully to your phone."
       );
+
+      // Clear previous OTP
+      setOtp("");
 
     } catch (error) {
       console.error(
@@ -90,6 +96,7 @@ function VerifyPhone() {
         error
       );
 
+      // Show backend error if available
       setError(
         error.response?.data?.message ||
           "Failed to send OTP. Please try again."
@@ -110,6 +117,7 @@ function VerifyPhone() {
     setError("");
     setMessage("");
 
+    // Check user
     if (!userId) {
       setError(
         "User information not found. Please login again."
@@ -117,7 +125,8 @@ function VerifyPhone() {
       return;
     }
 
-    if (otp.length !== 6) {
+    // Check OTP
+    if (!/^\d{6}$/.test(otp)) {
       setError(
         "Please enter a valid 6-digit OTP."
       );
@@ -135,14 +144,25 @@ function VerifyPhone() {
         }
       );
 
+      console.log(
+        "Verify OTP response:",
+        response.data
+      );
+
       // ==========================================
-      // UPDATE USER
+      // UPDATE LOCAL STORAGE
       // ==========================================
 
       const updatedUser = {
         ...user,
+
+        // Save the 10-digit phone number
         phone: phone,
+
+        // Phone is now verified
         phoneVerified: true,
+
+        // Get latest KYC status from backend
         kycCompleted:
           response.data.kycCompleted === true,
       };
@@ -193,9 +213,12 @@ function VerifyPhone() {
   if (!userId) {
     return (
       <div className="verify-phone-page">
+
         <div className="verify-phone-card">
 
-          <h1>Verify Phone Number</h1>
+          <h1>
+            Verify Phone Number
+          </h1>
 
           <p>
             User information was not found.
@@ -210,6 +233,7 @@ function VerifyPhone() {
           </button>
 
         </div>
+
       </div>
     );
   }
@@ -223,7 +247,9 @@ function VerifyPhone() {
 
       <div className="verify-phone-card">
 
-        {/* HEADER */}
+        {/* ==================================
+            HEADER
+        ================================== */}
 
         <div className="verify-phone-header">
 
@@ -238,7 +264,9 @@ function VerifyPhone() {
 
         </div>
 
-        {/* PHONE NUMBER */}
+        {/* ==================================
+            PHONE NUMBER
+        ================================== */}
 
         <div className="form-group">
 
@@ -266,7 +294,9 @@ function VerifyPhone() {
 
         </div>
 
-        {/* SEND OTP */}
+        {/* ==================================
+            SEND OTP
+        ================================== */}
 
         <button
           type="button"
@@ -274,7 +304,7 @@ function VerifyPhone() {
           onClick={sendOtp}
           disabled={
             sendingOtp ||
-            phone.length !== 10
+            !/^\d{10}$/.test(phone)
           }
         >
           {sendingOtp
@@ -282,7 +312,9 @@ function VerifyPhone() {
             : "Send OTP"}
         </button>
 
-        {/* MESSAGE */}
+        {/* ==================================
+            SUCCESS MESSAGE
+        ================================== */}
 
         {message && (
           <div className="success-message">
@@ -290,13 +322,19 @@ function VerifyPhone() {
           </div>
         )}
 
+        {/* ==================================
+            ERROR MESSAGE
+        ================================== */}
+
         {error && (
           <div className="error-message">
             {error}
           </div>
         )}
 
-        {/* OTP FORM */}
+        {/* ==================================
+            OTP FORM
+        ================================== */}
 
         <form
           className="otp-form"
@@ -329,14 +367,16 @@ function VerifyPhone() {
 
           </div>
 
-          {/* VERIFY */}
+          {/* ==================================
+              VERIFY BUTTON
+          ================================== */}
 
           <button
             type="submit"
             className="primary-button"
             disabled={
               loading ||
-              otp.length !== 6
+              !/^\d{6}$/.test(otp)
             }
           >
             {loading
@@ -346,7 +386,9 @@ function VerifyPhone() {
 
         </form>
 
-        {/* RESEND */}
+        {/* ==================================
+            RESEND OTP
+        ================================== */}
 
         <button
           type="button"
@@ -354,7 +396,7 @@ function VerifyPhone() {
           onClick={sendOtp}
           disabled={
             sendingOtp ||
-            phone.length !== 10
+            !/^\d{10}$/.test(phone)
           }
         >
           {sendingOtp
