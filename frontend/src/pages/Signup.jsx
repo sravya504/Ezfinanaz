@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
+import GoogleButton from "./GoogleButton";
 import "../style/signup.scss";
 
-const API_URL = "https://ezfinanaz-backend1.onrender.com/";
+const API_URL = "https://ezfinanaz-backend1.onrender.com";
 
 function Signup() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ function Signup() {
   // ==========================================
 
   const [showPassword, setShowPassword] = useState(false);
+
   const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
 
@@ -41,7 +43,7 @@ function Signup() {
   };
 
   // ==========================================
-  // SIGNUP
+  // NORMAL SIGNUP
   // ==========================================
 
   const handleSubmit = async (e) => {
@@ -51,7 +53,10 @@ function Signup() {
     setSuccess("");
 
     // Check passwords
-    if (formData.password !== formData.confirmPassword) {
+    if (
+      formData.password !==
+      formData.confirmPassword
+    ) {
       setError("Passwords do not match");
       return;
     }
@@ -78,7 +83,10 @@ function Signup() {
       }, 1200);
 
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error(
+        "Registration error:",
+        error
+      );
 
       setError(
         error.response?.data?.message ||
@@ -182,9 +190,7 @@ function Signup() {
 
           </div>
 
-          {/* ==========================================
-              PASSWORD
-          ========================================== */}
+          {/* PASSWORD */}
 
           <div className="form-group">
 
@@ -230,9 +236,7 @@ function Signup() {
 
           </div>
 
-          {/* ==========================================
-              CONFIRM PASSWORD
-          ========================================== */}
+          {/* CONFIRM PASSWORD */}
 
           <div className="form-group">
 
@@ -250,7 +254,9 @@ function Signup() {
                     : "password"
                 }
                 name="confirmPassword"
-                value={formData.confirmPassword}
+                value={
+                  formData.confirmPassword
+                }
                 onChange={handleChange}
                 placeholder="Confirm your password"
                 autoComplete="new-password"
@@ -278,9 +284,7 @@ function Signup() {
 
           </div>
 
-          {/* ==========================================
-              ERROR
-          ========================================== */}
+          {/* ERROR */}
 
           {error && (
             <p className="signup-message error">
@@ -288,9 +292,7 @@ function Signup() {
             </p>
           )}
 
-          {/* ==========================================
-              SUCCESS
-          ========================================== */}
+          {/* SUCCESS */}
 
           {success && (
             <p className="signup-message success">
@@ -298,9 +300,7 @@ function Signup() {
             </p>
           )}
 
-          {/* ==========================================
-              CREATE ACCOUNT
-          ========================================== */}
+          {/* CREATE ACCOUNT */}
 
           <button
             type="submit"
@@ -312,6 +312,16 @@ function Signup() {
           </button>
 
         </form>
+
+        {/* ==========================================
+            GOOGLE SIGN UP
+        ========================================== */}
+
+        <div className="or-divider">
+          <span>OR</span>
+        </div>
+
+        <GoogleButton />
 
         {/* ==========================================
             LOGIN LINK

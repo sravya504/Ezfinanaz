@@ -17,12 +17,11 @@ const userSchema = new mongoose.Schema(
     },
 
     phone: {
-      type: String,
-      required: false,
-      unique: true,
-      sparse: true,
-      trim: true,
-    },
+  type: String,
+  unique: true,
+  sparse: true,
+  trim: true,
+},
 
     password: {
       type: String,
@@ -49,6 +48,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    
+    phoneOtp: {
+  type: String,
+  default: null,
+},
+
+phoneOtpExpires: {
+  type: Date,
+  default: null,
+},
 
     kyc: {
       fullName: {

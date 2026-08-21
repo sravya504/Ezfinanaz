@@ -1,0 +1,351 @@
+/* =========================================================
+   VERIFY PHONE PAGE
+========================================================= */
+
+.verify-phone-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f4f7fb;
+
+  padding: 40px 20px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.verify-phone-card {
+  width: 100%;
+  max-width: 460px;
+
+  background: #ffffff;
+
+  padding: 42px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.08);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.verify-phone-header {
+  margin-bottom: 28px;
+}
+
+.verify-phone-header h1 {
+  margin: 0 0 12px 0;
+
+  font-size: 32px;
+  font-weight: 700;
+
+  color: #172033;
+
+  line-height: 1.2;
+}
+
+.verify-phone-header p {
+  margin: 0;
+
+  font-size: 15px;
+
+  line-height: 1.6;
+
+  color: #687386;
+}
+
+
+/* =========================================================
+   PHONE DISPLAY
+========================================================= */
+
+.phone-display {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin-bottom: 24px;
+
+  padding: 14px 16px;
+
+  background: #f7f9fc;
+
+  border: 1px solid #e3e8ef;
+
+  border-radius: 10px;
+}
+
+.phone-display span {
+  font-size: 13px;
+
+  color: #707b8c;
+}
+
+.phone-display strong {
+  font-size: 16px;
+
+  color: #202938;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.otp-form {
+  margin-top: 24px;
+
+  width: 100%;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.otp-form .form-group {
+  width: 100%;
+
+  margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.otp-form .form-group label {
+  display: block;
+
+  width: 100%;
+
+  margin-bottom: 8px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #273142;
+}
+
+
+/* =========================================================
+   OTP INPUT
+========================================================= */
+
+.otp-form .form-group input {
+  display: block;
+
+  width: 100%;
+
+  height: 52px;
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d5dce6;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #1d2735;
+
+  font-size: 17px;
+
+  letter-spacing: 3px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.otp-form .form-group input::placeholder {
+  color: #a4adba;
+
+  letter-spacing: 1px;
+}
+
+.otp-form .form-group input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.primary-button {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  height: 48px;
+
+  padding: 0 20px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.primary-button:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.primary-button:disabled {
+  background: #aeb7c5;
+
+  color: #ffffff;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
+
+.success-message {
+  margin-top: 16px;
+
+  padding: 12px 14px;
+
+  border-radius: 8px;
+
+  background: #ecfdf3;
+
+  border: 1px solid #bbf7d0;
+
+  color: #15803d;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+========================================================= */
+
+.error-message {
+  margin-top: 16px;
+
+  padding: 12px 14px;
+
+  border-radius: 8px;
+
+  background: #fef2f2;
+
+  border: 1px solid #fecaca;
+
+  color: #dc2626;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   RESEND BUTTON
+========================================================= */
+
+.resend-button {
+  display: block;
+
+  width: 100%;
+
+  margin-top: 14px;
+
+  padding: 10px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.resend-button:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.resend-button:disabled {
+  color: #9aa3af;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .verify-phone-page {
+    padding: 20px;
+  }
+
+  .verify-phone-card {
+    padding: 28px 22px;
+
+    border-radius: 14px;
+  }
+
+  .verify-phone-header h1 {
+    font-size: 26px;
+  }
+
+}

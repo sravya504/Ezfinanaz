@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import VerifyPhone from "./pages/VerifyPhone";
 
 import Login from "./pages/login";
 import Signup from "./pages/Signup";
@@ -97,6 +98,12 @@ function App() {
           path="/admin/applications/:applicationId"
           element={<AdminApplicationDetails />}
         />
+
+
+        <Route
+  path="/verify-phone"
+  element={<VerifyPhone />}
+/>
 
       </Routes>
     </BrowserRouter>

@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { OAuth2Client } = require("google-auth-library");
+const crypto = require("crypto");
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID
 );
@@ -169,6 +170,7 @@ const login = async (req, res) => {
 };
 
 
+
 // ==========================================
 // GOOGLE LOGIN / SIGNUP
 // ==========================================
@@ -183,7 +185,10 @@ const googleLogin = async (req, res) => {
       });
     }
 
-    // Verify Google ID token
+    // ==========================================
+    // VERIFY GOOGLE ID TOKEN
+    // ==========================================
+
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -198,19 +203,23 @@ const googleLogin = async (req, res) => {
       email_verified,
     } = payload;
 
+    // Google must confirm the email
     if (!email || !email_verified) {
       return res.status(400).json({
         message: "Google email is not verified",
       });
     }
 
-    // Find existing user
+    // ==========================================
+    // FIND EXISTING USER
+    // ==========================================
+
     let user = await User.findOne({
       email: email.toLowerCase(),
     });
 
     // ==========================================
-    // CREATE NEW USER
+    // CREATE NEW GOOGLE USER
     // ==========================================
 
     if (!user) {
@@ -219,15 +228,15 @@ const googleLogin = async (req, res) => {
 
         email: email.toLowerCase(),
 
-        googleId,
+        googleId: googleId,
 
-        // Google has already verified the email
+        // Google has verified the email
         emailVerified: true,
 
-        // Phone must be verified separately
+        // Phone still needs OTP verification
         phoneVerified: false,
 
-        // No password for Google account
+        // Google users don't have a password
         password: undefined,
 
         // KYC starts incomplete
@@ -242,18 +251,19 @@ const googleLogin = async (req, res) => {
     // ==========================================
 
     else {
-      // Link Google account if necessary
+      // Link Google account
       if (!user.googleId) {
         user.googleId = googleId;
       }
 
+      // Google verified this email
       user.emailVerified = true;
 
       await user.save();
     }
 
     // ==========================================
-    // CREATE YOUR JWT
+    // CREATE JWT
     // ==========================================
 
     const token = jwt.sign(
@@ -283,9 +293,13 @@ const googleLogin = async (req, res) => {
         phone: user.phone,
         role: user.role,
 
-        emailVerified: user.emailVerified,
+        // Google email verification status
+        emailVerified: true,
+
+        // Phone requires separate OTP
         phoneVerified: user.phoneVerified,
 
+        // KYC status
         kycCompleted:
           user.kyc?.completed === true,
       },
@@ -303,8 +317,133 @@ const googleLogin = async (req, res) => {
   }
 };
 
+
+// ==========================================
+// SEND PHONE OTP
+// ==========================================
+
+const sendPhoneOtp = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const otp = crypto
+      .randomInt(100000, 1000000)
+      .toString();
+
+    user.phoneOtp = otp;
+
+    // OTP valid for 5 minutes
+    user.phoneOtpExpires =
+      new Date(Date.now() + 5 * 60 * 1000);
+
+    await user.save();
+
+    // TEMPORARY:
+    // For testing, show OTP in backend console.
+    console.log(
+      `PHONE OTP for ${user.phone}: ${otp}`
+    );
+
+    res.status(200).json({
+      message: "OTP sent successfully",
+
+      // REMOVE THIS IN PRODUCTION
+      otp,
+    });
+
+  } catch (error) {
+    console.error("Send OTP error:", error);
+
+    res.status(500).json({
+      message: "Failed to send OTP",
+    });
+  }
+};
+
+
+// ==========================================
+// VERIFY PHONE OTP
+// ==========================================
+
+const verifyPhoneOtp = async (req, res) => {
+  try {
+    const {
+      userId,
+      otp,
+    } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.phoneVerified) {
+      return res.status(400).json({
+        message: "Phone already verified",
+      });
+    }
+
+    if (!user.phoneOtp ||
+        !user.phoneOtpExpires) {
+      return res.status(400).json({
+        message: "Please request a new OTP",
+      });
+    }
+
+    if (
+      new Date() > user.phoneOtpExpires
+    ) {
+      return res.status(400).json({
+        message: "OTP expired",
+      });
+    }
+
+    if (user.phoneOtp !== otp) {
+      return res.status(400).json({
+        message: "Invalid OTP",
+      });
+    }
+
+    // SUCCESS
+    user.phoneVerified = true;
+    user.phoneOtp = null;
+    user.phoneOtpExpires = null;
+
+    await user.save();
+
+    res.status(200).json({
+  message: "Phone verified successfully",
+  phoneVerified: true,
+  kycCompleted: user.kyc?.completed === true,
+});
+
+  } catch (error) {
+    console.error(
+      "Verify OTP error:",
+      error
+    );
+
+    res.status(500).json({
+      message: "OTP verification failed",
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   googleLogin,
+  sendPhoneOtp,
+  verifyPhoneOtp,
 };

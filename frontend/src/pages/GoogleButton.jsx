@@ -1,49 +1,63 @@
-import { useEffect, useRef } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://ezfinanaz-backend1.onrender.com";
 
 function GoogleButton() {
-  const googleButtonRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleGoogleResponse = async (response) => {
+  const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const result = await axios.post(
+      console.log("Google credential received");
+
+      const response = await axios.post(
         `${API_URL}/api/auth/google`,
         {
-          credential: response.credential,
+          credential: credentialResponse.credential,
         }
       );
 
-      const { token, user } = result.data;
+      const { token, user } = response.data;
 
+      // Save authentication
       localStorage.setItem("token", token);
+
       localStorage.setItem(
         "user",
         JSON.stringify(user)
       );
 
+      // ==========================================
       // ADMIN
+      // ==========================================
+
       if (user.role === "admin") {
         navigate("/admin/dashboard");
         return;
       }
 
+      // ==========================================
       // CUSTOMER
+      // ==========================================
+
       if (user.role === "customer") {
 
+        // Google verifies EMAIL.
+        // Phone must still be verified separately.
         if (!user.phoneVerified) {
-          navigate("/customer/verify-phone");
+          navigate("/verify-phone");
           return;
         }
 
+        // Phone already verified.
+        // Check KYC.
         if (!user.kycCompleted) {
           navigate("/customer/kyc");
           return;
         }
 
+        // Everything completed.
         navigate("/customer/dashboard");
       }
 
@@ -60,62 +74,25 @@ function GoogleButton() {
     }
   };
 
-  useEffect(() => {
-
-    const initializeGoogle = () => {
-
-      if (
-        !window.google ||
-        !googleButtonRef.current
-      ) {
-        return;
-      }
-
-      window.google.accounts.id.initialize({
-        client_id:
-          import.meta.env.VITE_GOOGLE_CLIENT_ID,
-
-        callback: handleGoogleResponse,
-      });
-
-      window.google.accounts.id.renderButton(
-        googleButtonRef.current,
-        {
-          theme: "outline",
-          size: "large",
-          width: 350,
-          text: "continue_with",
-        }
-      );
-    };
-
-    if (window.google) {
-
-      initializeGoogle();
-
-    } else {
-
-      const interval = setInterval(() => {
-
-        if (window.google) {
-
-          clearInterval(interval);
-          initializeGoogle();
-
-        }
-
-      }, 100);
-
-      return () => clearInterval(interval);
-    }
-
-  }, []);
+  const handleGoogleError = () => {
+    console.error("Google Login Failed");
+  };
 
   return (
-    <div
-      ref={googleButtonRef}
-      className="google-button"
-    />
+    <div className="google-button">
+
+      <GoogleLogin
+        onSuccess={handleGoogleSuccess}
+        onError={handleGoogleError}
+        useOneTap={false}
+        theme="outline"
+        size="large"
+        text="signin_with"
+        shape="rectangular"
+        width="350"
+      />
+
+    </div>
   );
 }
 
