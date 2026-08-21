@@ -1,16 +1,87 @@
-# React + Vite
+# EZFINANZ – Loan Management Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+EZFINANZ is a web-based loan management platform that allows customers to create accounts, complete KYC verification, apply for loans, and track their loan applications. Administrators can review and manage customer loan applications through an admin dashboard.
 
-Currently, two official plugins are available:
+## Live Application
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+https://ezfinanaz-frontend5.onrender.com
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Customer
 
-## Expanding the ESLint configuration
+- Customer registration and login
+- Email and password authentication
+- Customer KYC verification
+- Loan application
+- Loan application tracking
+- Customer dashboard
+- Secure logout
+- Role-based access
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Authentication
+
+The system is designed to support multiple authentication methods:
+
+- Email and Password
+- Email verification
+- Phone number verification using OTP
+- Google OAuth login
+
+### Loan Management
+
+Customers can:
+
+- Apply for a loan
+- Enter loan details
+- Select EMI and tenure
+- Provide bank account information
+- Complete required declarations
+- Submit required verification information
+- Track the current application stage
+
+### Admin
+
+Administrators can:
+
+- Access the Admin Dashboard
+- View all loan applications
+- View applicant details
+- View requested loan amount
+- View loan tenure
+- View current application stage
+- View submission date
+- Open individual loan applications
+- Refresh application data
+
+## Application Flow
+
+### Customer Flow
+
+```text
+Sign Up / Login
+       ↓
+Email & Phone Verification
+       ↓
+KYC Verification
+       ↓
+Customer Dashboard
+       ↓
+Apply for Loan
+       ↓
+Loan Details
+       ↓
+EMI Selection
+       ↓
+Bank Account
+       ↓
+Declaration
+       ↓
+Selfie / Verification
+       ↓
+Admin Review
+       ↓
+Loan Decision
+       ↓
+Disbursement
+```

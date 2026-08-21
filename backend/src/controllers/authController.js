@@ -1,6 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID
+);
 
 // ==========================================
 // REGISTER
@@ -164,7 +168,143 @@ const login = async (req, res) => {
   }
 };
 
+
+// ==========================================
+// GOOGLE LOGIN / SIGNUP
+// ==========================================
+
+const googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        message: "Google credential is required",
+      });
+    }
+
+    // Verify Google ID token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    const {
+      sub: googleId,
+      email,
+      name,
+      email_verified,
+    } = payload;
+
+    if (!email || !email_verified) {
+      return res.status(400).json({
+        message: "Google email is not verified",
+      });
+    }
+
+    // Find existing user
+    let user = await User.findOne({
+      email: email.toLowerCase(),
+    });
+
+    // ==========================================
+    // CREATE NEW USER
+    // ==========================================
+
+    if (!user) {
+      user = await User.create({
+        fullName: name || "Google User",
+
+        email: email.toLowerCase(),
+
+        googleId,
+
+        // Google has already verified the email
+        emailVerified: true,
+
+        // Phone must be verified separately
+        phoneVerified: false,
+
+        // No password for Google account
+        password: undefined,
+
+        // KYC starts incomplete
+        kyc: {
+          completed: false,
+        },
+      });
+    }
+
+    // ==========================================
+    // EXISTING USER
+    // ==========================================
+
+    else {
+      // Link Google account if necessary
+      if (!user.googleId) {
+        user.googleId = googleId;
+      }
+
+      user.emailVerified = true;
+
+      await user.save();
+    }
+
+    // ==========================================
+    // CREATE YOUR JWT
+    // ==========================================
+
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    // ==========================================
+    // RESPONSE
+    // ==========================================
+
+    res.status(200).json({
+      message: "Google login successful",
+
+      token,
+
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+
+        emailVerified: user.emailVerified,
+        phoneVerified: user.phoneVerified,
+
+        kycCompleted:
+          user.kyc?.completed === true,
+      },
+    });
+
+  } catch (error) {
+    console.error(
+      "Google login error:",
+      error
+    );
+
+    res.status(401).json({
+      message: "Google authentication failed",
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  googleLogin,
 };

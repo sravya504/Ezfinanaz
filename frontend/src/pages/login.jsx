@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
+import GoogleButton from "./GoogleButton";
 import "../style/login.scss";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://ezfinanaz-backend1.onrender.com/";
 
 function Login() {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ function Login() {
   // SHOW / HIDE PASSWORD
   // ==========================================
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
 
   // ==========================================
   // HANDLE INPUT CHANGE
@@ -52,9 +54,13 @@ function Login() {
 
       const { token, user } = response.data;
 
-      // Save authentication information
+      // Save authentication
       localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
 
       // ==========================================
       // ADMIN
@@ -70,21 +76,21 @@ function Login() {
       // ==========================================
 
       if (user.role === "customer") {
-        /*
-          KYC is NOT collected during signup.
 
-          After login:
-          1. Check whether KYC is completed.
-          2. If not completed -> KYC page.
-          3. If completed -> Customer dashboard.
-        */
-
-        if (!user.kycCompleted) {
-          navigate("/customer/kyc");
-        } else {
-          navigate("/customer/dashboard");
+        // Phone verification
+        if (!user.phoneVerified) {
+          navigate("/customer/verify-phone");
+          return;
         }
 
+        // KYC
+        if (!user.kycCompleted) {
+          navigate("/customer/kyc");
+          return;
+        }
+
+        // Dashboard
+        navigate("/customer/dashboard");
         return;
       }
 
@@ -95,12 +101,16 @@ function Login() {
       setError("Invalid user role.");
 
     } catch (error) {
-      console.error("Login error:", error);
+      console.error(
+        "Login error:",
+        error
+      );
 
       setError(
         error.response?.data?.message ||
           "Login failed. Please check your email and password."
       );
+
     } finally {
       setLoading(false);
     }
@@ -115,7 +125,9 @@ function Login() {
 
       <div className="login-card">
 
-        {/* Header */}
+        {/* ======================================
+            HEADER
+        ====================================== */}
 
         <div className="login-header">
 
@@ -127,11 +139,13 @@ function Login() {
 
         </div>
 
-        {/* Login Form */}
+        {/* ======================================
+            LOGIN FORM
+        ====================================== */}
 
         <form onSubmit={handleSubmit}>
 
-          {/* Email */}
+          {/* EMAIL */}
 
           <div className="form-group">
 
@@ -152,48 +166,53 @@ function Login() {
 
           </div>
 
-          {/* Password */}
+          {/* PASSWORD */}
 
-          {/* Password */}
+          <div className="form-group">
 
-<div className="form-group">
+            <label htmlFor="password">
+              Password
+            </label>
 
-  <label htmlFor="password">
-    Password
-  </label>
+            <div className="password-input-wrapper">
 
-  <div className="password-input-wrapper">
+              <input
+                id="password"
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                required
+              />
 
-    <input
-      id="password"
-      type={showPassword ? "text" : "password"}
-      name="password"
-      value={formData.password}
-      onChange={handleChange}
-      placeholder="Enter your password"
-      autoComplete="current-password"
-      required
-    />
+              <button
+                type="button"
+                className="password-eye-button"
+                onClick={() =>
+                  setShowPassword(
+                    (prev) => !prev
+                  )
+                }
+                aria-label={
+                  showPassword
+                    ? "Hide password"
+                    : "Show password"
+                }
+              >
+                👁
+              </button>
 
-    <button
-      type="button"
-      className="password-eye-button"
-      onClick={() =>
-        setShowPassword((prev) => !prev)
-      }
-      aria-label={
-        showPassword
-          ? "Hide password"
-          : "Show password"
-      }
-    >
-      {showPassword ? "👁" : "👁"}
-    </button>
+            </div>
 
-  </div>
+          </div>
 
-</div>
-          {/* Error */}
+          {/* ERROR */}
 
           {error && (
             <div className="error-message">
@@ -201,7 +220,7 @@ function Login() {
             </div>
           )}
 
-          {/* Login Button */}
+          {/* LOGIN BUTTON */}
 
           <button
             type="submit"
@@ -215,7 +234,19 @@ function Login() {
 
         </form>
 
-        {/* Signup */}
+        {/* ======================================
+            GOOGLE LOGIN
+        ====================================== */}
+
+        <div className="or-divider">
+          <span>OR</span>
+        </div>
+
+        <GoogleButton />
+
+        {/* ======================================
+            SIGNUP
+        ====================================== */}
 
         <div className="register-link">
 

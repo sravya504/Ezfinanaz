@@ -18,14 +18,20 @@ const userSchema = new mongoose.Schema(
 
     phone: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
+      sparse: true,
       trim: true,
     },
 
     password: {
       type: String,
-      required: true,
+      required: false,
+    },
+
+    googleId: {
+      type: String,
+      default: null,
     },
 
     role: {
@@ -43,10 +49,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
-    // ==========================================
-    // KYC DETAILS
-    // ==========================================
 
     kyc: {
       fullName: {

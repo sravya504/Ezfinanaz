@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import Signup from "./pages/Signup";
 
 import CustomerDashboard from "./pages/CustomerDashboard";
@@ -104,3 +104,9 @@ function App() {
 }
 
 export default App;
+
+
+
+
+//   google client id
+//   410196506092-vgs0r9u78ct2iek3o9qh7er6d4ds3994.apps.googleusercontent.com 

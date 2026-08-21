@@ -239,3 +239,35 @@
   width: 20px;
   height: 20px;
 }
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 20px 0;
+
+  color: #9ca3af;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+
+    height: 1px;
+
+    background: #e5e7eb;
+  }
+}
+
+.google-button {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 10px;
+}
