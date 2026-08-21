@@ -14,8 +14,8 @@ const googleClient = new OAuth2Client(
 // ==========================================
 
 const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
+  process.env.AccountSID,
+  process.env.AuthToken
 );
 
 // ==========================================
