@@ -79,7 +79,7 @@ function Login() {
 
         // Phone verification
         if (!user.phoneVerified) {
-          navigate("/customer/verify-phone");
+          navigate("/verify-phone");
           return;
         }
 
