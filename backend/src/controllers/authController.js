@@ -9,6 +9,39 @@ const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID
 );
 
+
+
+
+// ==========================================
+// CHECK TWILIO ENVIRONMENT VARIABLES
+// ==========================================
+
+console.log("========== TWILIO ENV CHECK ==========");
+
+console.log(
+  "AccountSID exists:",
+  !!process.env.AccountSID
+);
+
+console.log(
+  "AuthToken exists:",
+  !!process.env.AuthToken
+);
+
+console.log(
+  "TWILIO_PHONE_NUMBER exists:",
+  !!process.env.TWILIO_PHONE_NUMBER
+);
+
+console.log(
+  "TWILIO_PHONE_NUMBER:",
+  process.env.TWILIO_PHONE_NUMBER
+);
+
+console.log("=======================================");
+
+
+
 // ==========================================
 // TWILIO
 // ==========================================
@@ -329,57 +362,198 @@ const googleLogin = async (req, res) => {
 // SEND PHONE OTP
 // ==========================================
 
+// ==========================================
+// SEND PHONE OTP
+// ==========================================
+
 const sendPhoneOtp = async (req, res) => {
+  console.log("\n");
+  console.log("==========================================");
+  console.log("       SEND PHONE OTP REQUEST");
+  console.log("==========================================");
+
   try {
+    // ==========================================
+    // 1. CHECK REQUEST BODY
+    // ==========================================
+
+    console.log("STEP 1: Request received");
+
+    console.log("Request body:", {
+      userId: req.body?.userId,
+      phone: req.body?.phone,
+    });
+
     const {
       userId,
       phone,
     } = req.body;
 
-    // ==========================================
-    // VALIDATE INPUT
-    // ==========================================
-
     if (!userId || !phone) {
+      console.error(
+        "ERROR: userId or phone is missing"
+      );
+
       return res.status(400).json({
         message:
           "User ID and phone number are required",
       });
     }
 
+    // ==========================================
+    // 2. VALIDATE PHONE
+    // ==========================================
+
+    console.log(
+      "STEP 2: Validating phone number"
+    );
+
+    console.log(
+      "Phone received:",
+      phone
+    );
+
     if (!/^\d{10}$/.test(phone)) {
+      console.error(
+        "ERROR: Invalid phone format"
+      );
+
       return res.status(400).json({
         message:
           "Enter a valid 10-digit phone number",
       });
     }
 
+    console.log(
+      "Phone validation successful"
+    );
+
     // ==========================================
-    // FIND USER
+    // 3. CHECK TWILIO VARIABLES
     // ==========================================
+
+    console.log(
+      "STEP 3: Checking Twilio configuration"
+    );
+
+    console.log(
+      "AccountSID exists:",
+      !!process.env.AccountSID
+    );
+
+    console.log(
+      "AuthToken exists:",
+      !!process.env.AuthToken
+    );
+
+    console.log(
+      "Twilio phone exists:",
+      !!process.env.TWILIO_PHONE_NUMBER
+    );
+
+    console.log(
+      "Twilio phone:",
+      process.env.TWILIO_PHONE_NUMBER
+    );
+
+    if (!process.env.AccountSID) {
+      console.error(
+        "ERROR: AccountSID is missing"
+      );
+
+      return res.status(500).json({
+        message:
+          "Twilio AccountSID is not configured",
+      });
+    }
+
+    if (!process.env.AuthToken) {
+      console.error(
+        "ERROR: AuthToken is missing"
+      );
+
+      return res.status(500).json({
+        message:
+          "Twilio AuthToken is not configured",
+      });
+    }
+
+    if (!process.env.TWILIO_PHONE_NUMBER) {
+      console.error(
+        "ERROR: TWILIO_PHONE_NUMBER is missing"
+      );
+
+      return res.status(500).json({
+        message:
+          "Twilio phone number is not configured",
+      });
+    }
+
+    console.log(
+      "Twilio configuration exists"
+    );
+
+    // ==========================================
+    // 4. FIND USER
+    // ==========================================
+
+    console.log(
+      "STEP 4: Finding user in MongoDB"
+    );
+
+    console.log(
+      "User ID:",
+      userId
+    );
 
     const user =
       await User.findById(userId);
 
     if (!user) {
+      console.error(
+        "ERROR: User not found"
+      );
+
       return res.status(404).json({
-        message: "User not found",
+        message:
+          "User not found",
       });
     }
 
+    console.log(
+      "User found:",
+      user._id.toString()
+    );
+
     // ==========================================
-    // SAVE PHONE NUMBER
+    // 5. GENERATE OTP
     // ==========================================
 
-    user.phone = phone;
-
-    // ==========================================
-    // GENERATE OTP
-    // ==========================================
+    console.log(
+      "STEP 5: Generating OTP"
+    );
 
     const otp = crypto
-      .randomInt(100000, 1000000)
+      .randomInt(
+        100000,
+        1000000
+      )
       .toString();
+
+    console.log(
+      "OTP generated:",
+      otp
+    );
+
+    // ==========================================
+    // 6. SAVE PHONE + OTP
+    // ==========================================
+
+    console.log(
+      "STEP 6: Saving OTP to MongoDB"
+    );
+
+    user.phone = phone;
 
     user.phoneOtp = otp;
 
@@ -389,18 +563,78 @@ const sendPhoneOtp = async (req, res) => {
         5 * 60 * 1000
       );
 
-   
+    await user.save();
+
+    console.log(
+      "OTP successfully saved to MongoDB"
+    );
 
     // ==========================================
-    // FORMAT INDIAN PHONE NUMBER
+    // 7. FORMAT PHONE NUMBER
     // ==========================================
+
+    console.log(
+      "STEP 7: Formatting phone number"
+    );
 
     const formattedPhone =
       `+91${phone}`;
 
+    console.log(
+      "Phone sent to Twilio:",
+      formattedPhone
+    );
+
+    console.log(
+      "Twilio FROM number:",
+      process.env.TWILIO_PHONE_NUMBER
+    );
+
     // ==========================================
-    // SEND SMS THROUGH TWILIO
+    // 8. CHECK TWILIO CLIENT
     // ==========================================
+
+    console.log(
+      "STEP 8: Checking Twilio client"
+    );
+
+    console.log(
+      "Twilio client exists:",
+      !!twilioClient
+    );
+
+    if (!twilioClient) {
+      console.error(
+        "ERROR: Twilio client was not initialized"
+      );
+
+      return res.status(500).json({
+        message:
+          "Twilio client initialization failed",
+      });
+    }
+
+    console.log(
+      "Twilio client initialized"
+    );
+
+    // ==========================================
+    // 9. SEND SMS
+    // ==========================================
+
+    console.log(
+      "STEP 9: Sending SMS through Twilio..."
+    );
+
+    console.log(
+      "FROM:",
+      process.env.TWILIO_PHONE_NUMBER
+    );
+
+    console.log(
+      "TO:",
+      formattedPhone
+    );
 
     const twilioMessage =
       await twilioClient.messages.create({
@@ -414,39 +648,147 @@ const sendPhoneOtp = async (req, res) => {
           formattedPhone,
       });
 
-       await user.save();
+    // ==========================================
+    // 10. TWILIO SUCCESS
+    // ==========================================
 
     console.log(
-      "OTP SMS sent successfully:",
+      "=========================================="
+    );
+
+    console.log(
+      "        TWILIO SMS SUCCESS"
+    );
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "Message SID:",
       twilioMessage.sid
     );
 
+    console.log(
+      "Message status:",
+      twilioMessage.status
+    );
+
+    console.log(
+      "Message direction:",
+      twilioMessage.direction
+    );
+
+    console.log(
+      "Message price:",
+      twilioMessage.price
+    );
+
+    console.log(
+      "Message error code:",
+      twilioMessage.errorCode
+    );
+
+    console.log(
+      "Message error message:",
+      twilioMessage.errorMessage
+    );
+
+    console.log(
+      "=========================================="
+    );
+
     // ==========================================
-    // RESPONSE
+    // 11. SUCCESS RESPONSE
     // ==========================================
 
     return res.status(200).json({
       message:
         "OTP sent successfully",
+
+      // Do NOT return OTP here.
+      // OTP must remain server-side.
+
+      messageSid:
+        twilioMessage.sid,
+
+      status:
+        twilioMessage.status,
     });
 
   } catch (error) {
-  console.error("========== SEND OTP ERROR ==========");
-  console.error("MESSAGE:", error.message);
-  console.error("CODE:", error.code);
-  console.error("STATUS:", error.status);
-  console.error("MORE INFO:", error.moreInfo);
-  console.error("STACK:", error.stack);
-  console.error("====================================");
+
+    // ==========================================
+    // COMPLETE ERROR INFORMATION
+    // ==========================================
+
+    console.error("\n");
+    console.error(
+      "=========================================="
+    );
+
+    console.error(
+      "          SEND OTP FAILED"
+    );
+
+    console.error(
+      "=========================================="
+    );
+
+    console.error(
+      "Error name:",
+      error.name
+    );
+
+    console.error(
+      "Error message:",
+      error.message
+    );
+
+    console.error(
+      "Error code:",
+      error.code
+    );
+
+    console.error(
+      "Error status:",
+      error.status
+    );
+
+    console.error(
+      "Error moreInfo:",
+      error.moreInfo
+    );
+
+    console.error(
+      "Error details:",
+      error.details
+    );
+
+    console.error(
+      "Error stack:",
+      error.stack
+    );
+
+    console.error(
+      "=========================================="
+    );
 
     return res.status(500).json({
       message:
         error.message ||
         "Failed to send OTP",
+
+      // Temporary debugging information.
+      // Remove this after fixing the problem.
+      code:
+        error.code || null,
+
+      status:
+        error.status || null,
     });
   }
 };
-
 // ==========================================
 // VERIFY PHONE OTP
 // ==========================================
