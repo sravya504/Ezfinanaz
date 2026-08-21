@@ -1,29 +1,70 @@
+// 
+
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import "../style/admin-dashboard.scss";
+
+const API_URL = "http://localhost:5000";
 
 function AdminDashboard() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // =====================================================
+  // FETCH APPLICATIONS
+  // =====================================================
+
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/");
+        return;
+      }
+
+      const response = await axios.get(
+        `${API_URL}/api/admin/applications`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setApplications(response.data.applications || []);
+    } catch (err) {
+      console.error("Fetch applications error:", err);
+
+      setError(
+        err.response?.data?.message ||
+          "Failed to load applications."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =====================================================
+  // INITIAL LOAD
+  // =====================================================
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    fetchApplications();
+  }, []);
 
-    if (!storedUser) {
-      navigate("/");
-      return;
-    }
-
-    const parsedUser = JSON.parse(storedUser);
-
-    if (parsedUser.role !== "admin") {
-      navigate("/");
-      return;
-    }
-
-    setUser(parsedUser);
-  }, [navigate]);
+  // =====================================================
+  // LOGOUT
+  // =====================================================
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -32,125 +73,315 @@ function AdminDashboard() {
     navigate("/");
   };
 
-  if (!user) {
-    return null;
+  // =====================================================
+  // FORMAT STAGE
+  // =====================================================
+
+  const formatStage = (stage) => {
+    const stages = {
+      eligibility: "Eligibility",
+      emi_selection: "EMI Selection",
+      bank_account: "Bank Account",
+      declaration: "Declaration",
+      selfie: "Selfie Pending",
+      admin_review: "Admin Review",
+      disbursement: "Disbursement",
+      completed: "Completed",
+    };
+
+    return stages[stage] || stage || "--";
+  };
+
+  // =====================================================
+  // FORMAT CURRENCY
+  // =====================================================
+
+  const formatCurrency = (value) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return "--";
+    }
+
+    return `₹${Number(value).toLocaleString("en-IN")}`;
+  };
+
+  // =====================================================
+  // FORMAT DATE
+  // =====================================================
+
+  const formatDate = (date) => {
+    if (!date) {
+      return "--";
+    }
+
+    return new Date(date).toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
+  // =====================================================
+  // GET APPLICANT NAME
+  // =====================================================
+
+  const getApplicantName = (application) => {
+    return (
+      application.user?.fullName ||
+      application.kyc?.fullName ||
+      "--"
+    );
+  };
+
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (loading) {
+    return (
+      <div className="admin-dashboard-page">
+        <div className="admin-card">
+          <p>Loading applications...</p>
+        </div>
+      </div>
+    );
   }
 
+  // =====================================================
+  // UI
+  // =====================================================
+
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard-page">
 
-      <header className="admin-header">
+      <div className="admin-dashboard-container">
 
-        <div>
-          <h1>EZFINANZ</h1>
-          <span>Admin Portal</span>
-        </div>
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-        <div className="admin-user">
+        <div className="admin-header">
 
-          <span>{user.fullName}</span>
+          <div>
+            <h1>Admin Dashboard</h1>
 
-          <button onClick={handleLogout}>
+            <p>
+              Review and manage customer loan
+              applications.
+            </p>
+          </div>
+
+          <button
+            className="logout-button"
+            onClick={handleLogout}
+          >
             Logout
           </button>
 
         </div>
 
-      </header>
+        {/* =================================================
+            ERROR
+        ================================================= */}
 
-      <main className="admin-main">
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
 
-        <section className="admin-welcome">
+        {/* =================================================
+            SUMMARY
+        ================================================= */}
 
-          <h2>Admin Dashboard</h2>
+        <div className="summary-card">
 
-          <p>
-            Review and manage customer loan applications.
-          </p>
+          <div>
+            <span>Total Applications</span>
 
-        </section>
+            <strong>
+              {applications.length}
+            </strong>
+          </div>
 
-        <section className="admin-cards">
+          <div>
+            <span>Pending Review</span>
 
-          <div className="admin-card">
+            <strong>
+              {
+                applications.filter(
+                  (application) =>
+                    application.currentStage ===
+                    "admin_review"
+                ).length
+              }
+            </strong>
+          </div>
 
-            <div className="admin-card-icon">
-              ⏳
-            </div>
+        </div>
 
-            <h3>Pending Applications</h3>
+        {/* =================================================
+            APPLICATIONS
+        ================================================= */}
 
-            <p>
-              Review loan applications waiting for admin approval.
-            </p>
+        <div className="applications-card">
+
+          <div className="section-header">
+
+            <h2>Loan Applications</h2>
 
             <button
-              onClick={() =>
-                navigate("/admin/applications")
-              }
+              className="refresh-button"
+              onClick={fetchApplications}
             >
-              Review Applications
+              Refresh
             </button>
 
           </div>
 
-          <div className="admin-card">
+          {/* =================================================
+              NO APPLICATIONS
+          ================================================= */}
 
-            <div className="admin-card-icon">
-              ✓
+          {applications.length === 0 ? (
+
+            <div className="empty-state">
+
+              <h3>No Applications</h3>
+
+              <p>
+                No loan applications have been
+                submitted yet.
+              </p>
+
             </div>
 
-            <h3>Approved Loans</h3>
+          ) : (
 
-            <p>
-              View applications that have been approved.
-            </p>
+            <div className="table-wrapper">
 
-            <button>
-              View Approved
-            </button>
+              <table>
 
-          </div>
+                <thead>
 
-          <div className="admin-card">
+                  <tr>
+                    <th>Applicant</th>
+                    <th>Loan Amount</th>
+                    <th>Tenure</th>
+                    <th>Current Stage</th>
+                    <th>Submission Date</th>
+                    <th>Action</th>
+                  </tr>
 
-            <div className="admin-card-icon">
-              ✕
+                </thead>
+
+                <tbody>
+
+                  {applications.map(
+                    (application) => (
+
+                      <tr
+                        key={application._id}
+                      >
+
+                        {/* APPLICANT */}
+
+                        <td>
+
+                          <strong>
+                            {getApplicantName(
+                              application
+                            )}
+                          </strong>
+
+                          <small>
+                            {application.user?.email ||
+                              "--"}
+                          </small>
+
+                        </td>
+
+                        {/* LOAN AMOUNT */}
+
+                        <td>
+                          {formatCurrency(
+                            application
+                              .loanDetails
+                              ?.requestedLoanAmount
+                          )}
+                        </td>
+
+                        {/* TENURE */}
+
+                        <td>
+
+                          {application.emiTerms
+                            ?.tenure
+                            ? `${application.emiTerms.tenure} months`
+                            : "--"}
+
+                        </td>
+
+                        {/* CURRENT STAGE */}
+
+                        <td>
+
+                          <span
+                            className={`stage-badge ${
+                              application.currentStage ||
+                              ""
+                            }`}
+                          >
+                            {formatStage(
+                              application.currentStage
+                            )}
+                          </span>
+
+                        </td>
+
+                        {/* SUBMISSION DATE */}
+
+                        <td>
+                          {formatDate(
+                            application.createdAt
+                          )}
+                        </td>
+
+                        {/* VIEW */}
+
+                        <td>
+
+                          <button
+                            className="view-button"
+                            onClick={() =>
+                              navigate(
+                                `/admin/applications/${application._id}`
+                              )
+                            }
+                          >
+                            View Application
+                          </button>
+
+                        </td>
+
+                      </tr>
+
+                    )
+                  )}
+
+                </tbody>
+
+              </table>
+
             </div>
 
-            <h3>Rejected Applications</h3>
+          )}
 
-            <p>
-              View rejected loan applications.
-            </p>
+        </div>
 
-            <button>
-              View Rejected
-            </button>
-
-          </div>
-
-          <div className="admin-card">
-
-            <div className="admin-card-icon">
-              ◉
-            </div>
-
-            <h3>Customer Management</h3>
-
-            <p>
-              View and manage registered customers.
-            </p>
-
-            <button>
-              Customers
-            </button>
-
-          </div>
-
-        </section>
-
-      </main>
+      </div>
 
     </div>
   );

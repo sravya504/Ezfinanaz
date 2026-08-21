@@ -69,6 +69,8 @@
     color: #111827;
     font-size: 15px;
 
+    box-sizing: border-box;
+
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
@@ -86,9 +88,69 @@
   }
 }
 
+/* =====================================================
+   PASSWORD INPUT
+===================================================== */
+
+.password-input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  padding-right: 48px;
+}
+
+/* =====================================================
+   PASSWORD EYE BUTTON
+===================================================== */
+
+.password-toggle {
+  position: absolute;
+
+  right: 12px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #6b7280;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: #2563eb;
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
+/* =====================================================
+   SIGNUP BUTTON
+===================================================== */
+
 .signup-card {
   form {
-    button {
+    button[type="submit"] {
       width: 100%;
       height: 46px;
 
@@ -125,6 +187,10 @@
   }
 }
 
+/* =====================================================
+   MESSAGE
+===================================================== */
+
 .signup-message {
   margin-bottom: 15px;
 
@@ -140,10 +206,15 @@
   }
 }
 
+/* =====================================================
+   LOGIN LINK
+===================================================== */
+
 .login-link {
   display: flex;
   justify-content: center;
   align-items: center;
+
   gap: 6px;
 
   margin-top: 24px;
@@ -154,7 +225,9 @@
 
   a {
     color: #2563eb;
+
     font-weight: 600;
+
     text-decoration: none;
 
     &:hover {
@@ -163,6 +236,10 @@
   }
 }
 
+/* =====================================================
+   MOBILE
+===================================================== */
+
 @media (max-width: 480px) {
   .signup-page {
     padding: 16px;
@@ -170,7 +247,9 @@
 
   .signup-card {
     max-width: 100%;
+
     padding: 30px 22px;
+
     border-radius: 14px;
   }
 

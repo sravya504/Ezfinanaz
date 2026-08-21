@@ -1,0 +1,133 @@
+.kyc-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 50px 20px;
+  background: #f5f7fb;
+}
+
+.kyc-card {
+  width: 100%;
+  max-width: 700px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.kyc-header {
+  margin-bottom: 30px;
+}
+
+.kyc-header h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  color: #1f2937;
+}
+
+.kyc-header p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group input[type="file"] {
+  padding: 10px;
+  background: #f9fafb;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 7px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.optional {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.primary-button {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  padding: 13px 20px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.loading-card {
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .kyc-page {
+    padding: 20px 12px;
+  }
+
+  .kyc-card {
+    padding: 25px 20px;
+  }
+
+  .kyc-header h1 {
+    font-size: 25px;
+  }
+}

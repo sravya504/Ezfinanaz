@@ -1,0 +1,185 @@
+.application-page {
+  min-height: 100vh;
+  width: 100%;
+
+  padding: 40px 20px;
+
+  background: #f5f7fb;
+}
+
+.application-card {
+  width: 100%;
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  padding: 35px;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.back-button {
+  border: none;
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  margin-bottom: 25px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #6b7280;
+  }
+}
+
+.status-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 16px;
+
+  margin-bottom: 30px;
+}
+
+.status-item {
+  padding: 20px;
+
+  background: #f5f7fb;
+
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  span {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  strong {
+    color: #111827;
+    font-size: 18px;
+    text-transform: capitalize;
+  }
+}
+
+.details-section {
+  margin-bottom: 30px;
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  span {
+    color: #6b7280;
+  }
+
+  strong {
+    color: #111827;
+  }
+}
+
+.next-step {
+  padding: 22px;
+
+  background: #eff6ff;
+
+  border-radius: 12px;
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    color: #4b5563;
+    margin-bottom: 18px;
+  }
+
+  button {
+    border: none;
+    border-radius: 8px;
+
+    padding: 11px 18px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+
+  .rejected {
+    color: #dc2626;
+  }
+
+  .success {
+    color: #16a34a;
+  }
+}
+
+.error-message {
+  color: #dc2626;
+}
+
+@media (max-width: 600px) {
+
+  .application-page {
+    padding: 20px 14px;
+  }
+
+  .application-card {
+    padding: 25px 20px;
+  }
+
+  .status-section {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .page-header {
+    h1 {
+      font-size: 24px;
+    }
+  }
+}

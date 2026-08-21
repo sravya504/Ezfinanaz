@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const loanRoutes = require("./routes/loanRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const disbursementRoutes = require("./routes/disbursementRoutes");
+const kycRoutes = require("./routes/kycRoutes");
 const app = express();
 
 app.use(cors());
@@ -18,6 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/loans", loanRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin", disbursementRoutes);
+app.use("/api/kyc", kycRoutes);
 app.get("/", (req, res) => {
   res.json({
     message: "EZFINANZ API is running",

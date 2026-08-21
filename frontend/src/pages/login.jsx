@@ -17,12 +17,26 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ==========================================
+  // SHOW / HIDE PASSWORD
+  // ==========================================
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ==========================================
+  // HANDLE INPUT CHANGE
+  // ==========================================
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
+
+  // ==========================================
+  // LOGIN
+  // ==========================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,36 +52,92 @@ function Login() {
 
       const { token, user } = response.data;
 
+      // Save authentication information
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      // ==========================================
+      // ADMIN
+      // ==========================================
+
       if (user.role === "admin") {
         navigate("/admin/dashboard");
-      } else if (user.role === "customer") {
-        navigate("/customer/dashboard");
+        return;
       }
+
+      // ==========================================
+      // CUSTOMER
+      // ==========================================
+
+      if (user.role === "customer") {
+        /*
+          KYC is NOT collected during signup.
+
+          After login:
+          1. Check whether KYC is completed.
+          2. If not completed -> KYC page.
+          3. If completed -> Customer dashboard.
+        */
+
+        if (!user.kycCompleted) {
+          navigate("/customer/kyc");
+        } else {
+          navigate("/customer/dashboard");
+        }
+
+        return;
+      }
+
+      // ==========================================
+      // UNKNOWN ROLE
+      // ==========================================
+
+      setError("Invalid user role.");
+
     } catch (error) {
+      console.error("Login error:", error);
+
       setError(
         error.response?.data?.message ||
-          "Login failed. Please try again."
+          "Login failed. Please check your email and password."
       );
     } finally {
       setLoading(false);
     }
   };
 
+  // ==========================================
+  // UI
+  // ==========================================
+
   return (
     <div className="login-page">
-      <div className="login-card">
-        <h1>EZFINANZ</h1>
 
-        <p className="login-subtitle">
-          Login to your account
-        </p>
+      <div className="login-card">
+
+        {/* Header */}
+
+        <div className="login-header">
+
+          <h1>EZFINANZ</h1>
+
+          <p className="login-subtitle">
+            Login to your account
+          </p>
+
+        </div>
+
+        {/* Login Form */}
 
         <form onSubmit={handleSubmit}>
+
+          {/* Email */}
+
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+
+            <label htmlFor="email">
+              Email
+            </label>
 
             <input
               id="email"
@@ -76,47 +146,91 @@ function Login() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
+              autoComplete="email"
               required
             />
+
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          {/* Password */}
 
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
-          </div>
+          {/* Password */}
+
+<div className="form-group">
+
+  <label htmlFor="password">
+    Password
+  </label>
+
+  <div className="password-input-wrapper">
+
+    <input
+      id="password"
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={formData.password}
+      onChange={handleChange}
+      placeholder="Enter your password"
+      autoComplete="current-password"
+      required
+    />
+
+    <button
+      type="button"
+      className="password-eye-button"
+      onClick={() =>
+        setShowPassword((prev) => !prev)
+      }
+      aria-label={
+        showPassword
+          ? "Hide password"
+          : "Show password"
+      }
+    >
+      {showPassword ? "👁" : "👁"}
+    </button>
+
+  </div>
+
+</div>
+          {/* Error */}
 
           {error && (
-            <p className="error-message">
+            <div className="error-message">
               {error}
-            </p>
+            </div>
           )}
+
+          {/* Login Button */}
 
           <button
             type="submit"
+            className="login-button"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading
+              ? "Logging in..."
+              : "Login"}
           </button>
 
-          
         </form>
-       <div className="register-link">
-  <span>Don't have an account?</span>
 
-  <Link to="/signup">
-    Create Account
-  </Link>
-</div>
+        {/* Signup */}
+
+        <div className="register-link">
+
+          <span>
+            Don't have an account?
+          </span>
+
+          <Link to="/signup">
+            Create Account
+          </Link>
+
+        </div>
+
       </div>
+
     </div>
   );
 }

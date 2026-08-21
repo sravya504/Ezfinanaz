@@ -1,0 +1,471 @@
+.selfie-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.selfie-card {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 35px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================
+   BACK BUTTON
+========================================== */
+
+.back-button {
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 25px;
+}
+
+.back-button:hover {
+  color: #111827;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  color: #111827;
+}
+
+.page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   ALERTS
+========================================== */
+
+.alert {
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.error-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.success-alert {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+/* ==========================================
+   CHOICE SECTION
+========================================== */
+
+.choice-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 25px;
+  background: #ffffff;
+}
+
+.choice-section h2 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 21px;
+}
+
+.choice-section > p {
+  margin: 0 0 25px;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* ==========================================
+   CHOICE BUTTONS
+========================================== */
+
+.choice-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.choice-button {
+  min-height: 170px;
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px 20px;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.choice-button:hover {
+  border-color: #2563eb;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.1);
+  transform: translateY(-2px);
+}
+
+.choice-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 25px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.choice-button > span:nth-child(2) {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.choice-button small {
+  color: #6b7280;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ==========================================
+   FILE INPUT
+========================================== */
+
+.hidden-file-input {
+  display: none;
+}
+
+/* ==========================================
+   CAMERA
+========================================== */
+
+.camera-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.camera-section h2 {
+  margin: 0 0 20px;
+  font-size: 21px;
+  color: #111827;
+}
+
+.camera-container {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto 20px;
+
+  background: #111827;
+  border-radius: 12px;
+  overflow: hidden;
+
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  /*
+    Mirror the live camera preview
+    like a normal selfie camera.
+  */
+  transform: scaleX(-1);
+}
+
+.hidden-canvas {
+  display: none;
+}
+
+.camera-error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  margin: 0 0 15px;
+}
+
+.camera-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================
+   CAPTURE BUTTON
+========================================== */
+
+.capture-button {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 22px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.capture-button:hover {
+  background: #1d4ed8;
+}
+
+/* ==========================================
+   PREVIEW
+========================================== */
+
+.preview-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.preview-section h2 {
+  margin: 0 0 20px;
+  color: #111827;
+  font-size: 21px;
+}
+
+.preview-container {
+  width: 100%;
+  max-width: 420px;
+  height: 420px;
+  margin: 0 auto 15px;
+
+  background: #f3f4f6;
+  border-radius: 12px;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selfie-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-name {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 0 0 20px;
+
+  word-break: break-word;
+}
+
+/* ==========================================
+   PREVIEW ACTIONS
+========================================== */
+
+.preview-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================
+   PRIMARY BUTTON
+========================================== */
+
+.primary-button {
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+
+  border-radius: 8px;
+  padding: 12px 22px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==========================================
+   SECONDARY BUTTON
+========================================== */
+
+.secondary-button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+
+  border-radius: 8px;
+  padding: 12px 22px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==========================================
+   REQUIREMENTS
+========================================== */
+
+.requirements-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 22px 25px;
+}
+
+.requirements-section h2 {
+  margin: 0 0 15px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.requirements-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.requirements-section li {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .selfie-page {
+    padding: 20px 12px;
+  }
+
+  .selfie-card {
+    padding: 22px 18px;
+    border-radius: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 25px;
+  }
+
+  .choice-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .choice-button {
+    min-height: 145px;
+  }
+
+  .camera-section,
+  .choice-section,
+  .preview-section {
+    padding: 18px;
+  }
+
+  .preview-container {
+    height: 330px;
+  }
+
+  .camera-buttons,
+  .preview-actions {
+    flex-direction: column;
+  }
+
+  .camera-buttons button,
+  .preview-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .selfie-card {
+    padding: 18px 14px;
+  }
+
+  .preview-container {
+    height: 280px;
+  }
+}

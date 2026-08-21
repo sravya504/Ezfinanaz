@@ -1,17 +1,50 @@
 const LoanApplication = require("../models/LoanApplication");
 
+// =====================================================
+// GET ALL APPLICATIONS
+// =====================================================
+
+const getAllApplications = async (req, res) => {
+  try {
+    const applications = await LoanApplication.find({})
+      .populate(
+        "user",
+        "fullName name email phone emailVerified phoneVerified kyc createdAt"
+      )
+      .populate("adminReview.reviewedBy", "fullName email")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.status(200).json({
+      count: applications.length,
+      applications,
+    });
+  } catch (error) {
+    console.error("Get all applications error:", error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+// =====================================================
+// GET PENDING APPLICATIONS
+// =====================================================
+
 const getPendingApplications = async (req, res) => {
   try {
     const applications = await LoanApplication.find({
       currentStage: "admin_review",
       "adminReview.decision": "pending",
-
-    
     })
-    
-      .populate("user", "name email phone")
-      .sort({ createdAt: -1 });
-     
+      .populate(
+        "user",
+        "fullName name email phone emailVerified phoneVerified kyc createdAt"
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+
     res.status(200).json({
       count: applications.length,
       applications,
@@ -25,13 +58,21 @@ const getPendingApplications = async (req, res) => {
   }
 };
 
+// =====================================================
+// GET SINGLE APPLICATION
+// =====================================================
+
 const getApplicationById = async (req, res) => {
   try {
     const { applicationId } = req.params;
 
-    const application = await LoanApplication.findById(
-      applicationId
-    ).populate("user", "name email phone");
+    const application = await LoanApplication.findById(applicationId)
+      .populate(
+        "user",
+        "fullName name email phone emailVerified phoneVerified kyc createdAt"
+      )
+      .populate("adminReview.reviewedBy", "fullName email")
+      .lean();
 
     if (!application) {
       return res.status(404).json({
@@ -51,13 +92,123 @@ const getApplicationById = async (req, res) => {
   }
 };
 
+// =====================================================
+// APPROVE SELFIE / PHOTO
+// =====================================================
+
+const approveSelfie = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+
+    const application = await LoanApplication.findById(applicationId);
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Loan application not found",
+      });
+    }
+
+    if (application.currentStage !== "admin_review") {
+      return res.status(400).json({
+        message: "Application is not waiting for admin review",
+      });
+    }
+
+    if (!application.selfie || !application.selfie.imageUrl) {
+      return res.status(400).json({
+        message: "No selfie has been submitted",
+      });
+    }
+
+    // Approve selfie only.
+    // Final application decision remains pending.
+    application.selfie.verified = true;
+    application.selfie.verifiedAt = new Date();
+
+    await application.save();
+
+    res.status(200).json({
+      message: "Photo approved successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Approve selfie error:", error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+// =====================================================
+// REJECT SELFIE / PHOTO
+// =====================================================
+
+const rejectSelfie = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+
+    const { rejectionReason } = req.body || {};
+
+    const application = await LoanApplication.findById(applicationId);
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Loan application not found",
+      });
+    }
+
+    if (application.currentStage !== "admin_review") {
+      return res.status(400).json({
+        message: "Application is not waiting for admin review",
+      });
+    }
+
+    if (!application.selfie || !application.selfie.imageUrl) {
+      return res.status(400).json({
+        message: "No selfie has been submitted",
+      });
+    }
+
+    application.selfie.verified = false;
+    application.selfie.verifiedAt = null;
+
+    application.adminReview = {
+      decision: "rejected",
+      rejectionReason:
+        rejectionReason?.trim() ||
+        "Photo verification rejected.",
+      reviewedBy: req.user.userId,
+      reviewedAt: new Date(),
+    };
+
+    application.status = "rejected";
+    application.currentStage = "completed";
+
+    await application.save();
+
+    res.status(200).json({
+      message: "Photo rejected successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Reject selfie error:", error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+// =====================================================
+// APPROVE ENTIRE APPLICATION
+// =====================================================
+
 const approveApplication = async (req, res) => {
   try {
     const { applicationId } = req.params;
 
-    const application = await LoanApplication.findById(
-      applicationId
-    );
+    const application = await LoanApplication.findById(applicationId);
 
     if (!application) {
       return res.status(404).json({
@@ -71,9 +222,20 @@ const approveApplication = async (req, res) => {
       });
     }
 
-    if (application.adminReview.decision !== "pending") {
+    if (
+      application.adminReview &&
+      application.adminReview.decision !== "pending"
+    ) {
       return res.status(400).json({
         message: "Application has already been reviewed",
+      });
+    }
+
+    // Photo must be approved before final approval.
+    if (!application.selfie || !application.selfie.verified) {
+      return res.status(400).json({
+        message:
+          "Please approve the photo before approving the application.",
       });
     }
 
@@ -86,12 +248,13 @@ const approveApplication = async (req, res) => {
 
     application.status = "approved";
 
+    // Move application to disbursement.
     application.currentStage = "disbursement";
 
     await application.save();
 
     res.status(200).json({
-      message: "Loan application approved successfully",
+      message: "Application approved successfully",
       application,
     });
   } catch (error) {
@@ -103,21 +266,24 @@ const approveApplication = async (req, res) => {
   }
 };
 
+// =====================================================
+// REJECT ENTIRE APPLICATION
+// =====================================================
+
 const rejectApplication = async (req, res) => {
   try {
     const { applicationId } = req.params;
 
     const { rejectionReason } = req.body || {};
 
-    if (!rejectionReason) {
+    // Reason is REQUIRED.
+    if (!rejectionReason || !rejectionReason.trim()) {
       return res.status(400).json({
-        message: "Rejection reason is required",
+        message: "Please provide a rejection reason.",
       });
     }
 
-    const application = await LoanApplication.findById(
-      applicationId
-    );
+    const application = await LoanApplication.findById(applicationId);
 
     if (!application) {
       return res.status(404).json({
@@ -131,7 +297,10 @@ const rejectApplication = async (req, res) => {
       });
     }
 
-    if (application.adminReview.decision !== "pending") {
+    if (
+      application.adminReview &&
+      application.adminReview.decision !== "pending"
+    ) {
       return res.status(400).json({
         message: "Application has already been reviewed",
       });
@@ -139,7 +308,7 @@ const rejectApplication = async (req, res) => {
 
     application.adminReview = {
       decision: "rejected",
-      rejectionReason,
+      rejectionReason: rejectionReason.trim(),
       reviewedBy: req.user.userId,
       reviewedAt: new Date(),
     };
@@ -151,7 +320,7 @@ const rejectApplication = async (req, res) => {
     await application.save();
 
     res.status(200).json({
-      message: "Loan application rejected",
+      message: "Application rejected successfully",
       application,
     });
   } catch (error) {
@@ -163,9 +332,16 @@ const rejectApplication = async (req, res) => {
   }
 };
 
+// =====================================================
+// EXPORT
+// =====================================================
+
 module.exports = {
+  getAllApplications,
   getPendingApplications,
   getApplicationById,
+  approveSelfie,
+  rejectSelfie,
   approveApplication,
   rejectApplication,
 };

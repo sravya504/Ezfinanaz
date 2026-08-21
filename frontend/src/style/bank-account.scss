@@ -1,0 +1,162 @@
+.bank-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.bank-card {
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 35px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.back-button {
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 25px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  color: #111827;
+}
+
+.page-header p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.loan-summary {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 22px;
+  margin-bottom: 28px;
+}
+
+.loan-summary h2 {
+  margin: 0 0 18px;
+  font-size: 20px;
+  color: #111827;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row span {
+  color: #6b7280;
+}
+
+.detail-row strong {
+  color: #111827;
+}
+
+.bank-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #2563eb;
+}
+
+.primary-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .bank-page {
+    padding: 20px 12px;
+  }
+
+  .bank-card {
+    padding: 22px;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+}

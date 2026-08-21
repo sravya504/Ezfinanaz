@@ -1,0 +1,469 @@
+.eligibility-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 24px;
+
+  background: #f5f7fb;
+}
+
+.eligibility-card {
+  width: 100%;
+  max-width: 760px;
+
+  padding: 40px;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ------------------------------
+   Back Button
+------------------------------ */
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 8px 0;
+
+  border: none;
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #1d4ed8;
+  }
+}
+
+/* ------------------------------
+   Page Header
+------------------------------ */
+
+.page-header {
+  margin-top: 20px;
+  margin-bottom: 30px;
+
+  h1 {
+    margin: 0 0 8px;
+
+    color: #111827;
+
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 15px;
+    line-height: 1.6;
+  }
+}
+
+/* ------------------------------
+   Loan Summary
+------------------------------ */
+
+.loan-summary {
+  margin-bottom: 28px;
+
+  padding: 24px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  h2 {
+    margin: 0 0 20px;
+
+    color: #111827;
+
+    font-size: 18px;
+    font-weight: 650;
+  }
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+
+  span {
+    color: #6b7280;
+
+    font-size: 14px;
+  }
+
+  strong {
+    color: #111827;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    text-align: right;
+  }
+}
+
+/* ------------------------------
+   Check Eligibility
+------------------------------ */
+
+.check-section {
+  padding: 28px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  text-align: center;
+
+  h2 {
+    margin: 0 0 10px;
+
+    color: #111827;
+
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0 auto 22px;
+
+    max-width: 520px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+/* ------------------------------
+   Result Section
+------------------------------ */
+
+.result-section {
+  margin-top: 10px;
+
+  padding: 28px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  h2 {
+    margin: 0 0 20px;
+
+    color: #111827;
+
+    font-size: 20px;
+  }
+}
+
+/* ------------------------------
+   Result Status
+------------------------------ */
+
+.result-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+
+  min-height: 56px;
+
+  margin-bottom: 24px;
+
+  border-radius: 10px;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  &.eligible {
+    background: #ecfdf5;
+
+    border: 1px solid #a7f3d0;
+
+    color: #047857;
+  }
+
+  &.partially-eligible {
+    background: #fffbeb;
+
+    border: 1px solid #fde68a;
+
+    color: #b45309;
+  }
+
+  &.not-eligible {
+    background: #fef2f2;
+
+    border: 1px solid #fecaca;
+
+    color: #dc2626;
+  }
+}
+
+/* ------------------------------
+   Result Details
+------------------------------ */
+
+.result-details {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 14px;
+
+  margin-bottom: 28px;
+}
+
+.result-item {
+  padding: 18px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  strong {
+    display: block;
+
+    color: #111827;
+
+    font-size: 17px;
+    font-weight: 700;
+  }
+}
+
+/* ------------------------------
+   Buttons
+------------------------------ */
+
+.primary-button {
+  width: 100%;
+
+  height: 46px;
+
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+
+  &:hover {
+    background: #1d4ed8;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+  }
+}
+
+.secondary-button {
+  width: 100%;
+
+  height: 46px;
+
+  padding: 0 18px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    background: #f9fafb;
+
+    border-color: #9ca3af;
+  }
+}
+
+/* ------------------------------
+   Messages
+------------------------------ */
+
+.error-message {
+  margin: 14px 0;
+
+  color: #dc2626;
+
+  font-size: 14px;
+
+  text-align: center;
+}
+
+.not-eligible-message {
+  margin-top: 10px;
+
+  p {
+    margin-bottom: 18px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    text-align: center;
+  }
+}
+
+/* ------------------------------
+   Tablet
+------------------------------ */
+
+@media (max-width: 700px) {
+  .eligibility-card {
+    padding: 30px;
+  }
+
+  .result-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------
+   Mobile
+------------------------------ */
+
+@media (max-width: 480px) {
+  .eligibility-page {
+    padding: 16px;
+
+    align-items: flex-start;
+  }
+
+  .eligibility-card {
+    max-width: 100%;
+
+    margin-top: 20px;
+
+    padding: 24px 20px;
+
+    border-radius: 14px;
+  }
+
+  .page-header {
+    margin-top: 18px;
+    margin-bottom: 24px;
+
+    h1 {
+      font-size: 25px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .loan-summary {
+    padding: 20px;
+  }
+
+  .check-section {
+    padding: 22px 18px;
+  }
+
+  .result-section {
+    padding: 22px 18px;
+  }
+
+  .detail-row {
+    align-items: flex-start;
+
+    span {
+      max-width: 55%;
+    }
+
+    strong {
+      max-width: 45%;
+
+      font-size: 14px;
+    }
+  }
+
+  .result-status {
+    font-size: 16px;
+  }
+
+  .result-item {
+    padding: 16px;
+  }
+}

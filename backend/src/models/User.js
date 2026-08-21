@@ -43,6 +43,57 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // ==========================================
+    // KYC DETAILS
+    // ==========================================
+
+    kyc: {
+      fullName: {
+        type: String,
+        default: null,
+        trim: true,
+      },
+
+      dateOfBirth: {
+        type: Date,
+        default: null,
+      },
+
+      gender: {
+        type: String,
+        enum: ["male", "female", "other"],
+        default: null,
+      },
+
+      currentAddress: {
+        type: String,
+        default: null,
+        trim: true,
+      },
+
+      idType: {
+        type: String,
+        enum: ["PAN", "Aadhaar"],
+        default: null,
+      },
+
+      idNumber: {
+        type: String,
+        default: null,
+        trim: true,
+      },
+
+      completed: {
+        type: Boolean,
+        default: false,
+      },
+
+      completedAt: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   {
     timestamps: true,

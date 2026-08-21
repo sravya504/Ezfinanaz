@@ -103,46 +103,9 @@ function CustomerDashboard() {
             </div>
           </div>
 
-          <div className="dashboard-card">
-            <div className="card-icon">✓</div>
+         
 
-            <div>
-              <h3>Loan Status</h3>
-
-              <p>
-                Check your eligibility and loan status.
-              </p>
-
-              <button
-                onClick={() =>
-                  navigate("/customer/application")
-                }
-              >
-                Check Status
-              </button>
-            </div>
-          </div>
-
-          <div className="dashboard-card">
-            <div className="card-icon">◉</div>
-
-            <div>
-              <h3>Profile</h3>
-
-              <p>
-                View and manage your account details.
-              </p>
-
-              <button
-                onClick={() =>
-                  navigate("/customer/profile")
-                }
-              >
-                View Profile
-              </button>
-            </div>
-          </div>
-
+          
         </section>
 
       </main>
