@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "../../style/declaration.scss";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://ezfinanaz-backend1.onrender.com";
 
 function Declaration() {
   const navigate = useNavigate();

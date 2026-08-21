@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import "../../style/selfie.scss";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://ezfinanaz-backend1.onrender.com";
 
 function Selfie() {
   const navigate = useNavigate();
