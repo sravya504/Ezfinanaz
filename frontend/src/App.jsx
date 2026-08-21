@@ -104,9 +104,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-//   google client id
-//   410196506092-vgs0r9u78ct2iek3o9qh7er6d4ds3994.apps.googleusercontent.com 
