@@ -5,7 +5,7 @@ import axios from "axios";
 import GoogleButton from "./GoogleButton";
 import "../style/login.scss";
 
-const API_URL = "https://ezfinanaz-backend1.onrender.com/";
+const API_URL = "https://ezfinanaz-backend1.onrender.com";
 
 function Login() {
   const navigate = useNavigate();
