@@ -1,4 +1,3 @@
-// 
 
 
 import { useEffect, useState } from "react";
@@ -16,9 +15,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // =====================================================
-  // FETCH APPLICATIONS
-  // =====================================================
+ 
 
   const fetchApplications = async () => {
     try {
@@ -54,9 +51,7 @@ function AdminDashboard() {
     }
   };
 
-  // =====================================================
-  // INITIAL LOAD
-  // =====================================================
+ 
 
   useEffect(() => {
     fetchApplications();

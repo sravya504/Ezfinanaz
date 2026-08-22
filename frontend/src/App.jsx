@@ -22,9 +22,7 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* ================================
-            AUTH
-        ================================= */}
+     
 
         <Route path="/" element={<Login />} />
 
@@ -34,9 +32,7 @@ function App() {
         />
 
 
-        {/* ================================
-            CUSTOMER
-        ================================= */}
+        
 
         <Route
           path="/customer/dashboard"

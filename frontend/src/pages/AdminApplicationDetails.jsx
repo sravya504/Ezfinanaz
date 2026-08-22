@@ -30,10 +30,6 @@ function AdminApplicationDetails() {
   const [showApplicationRejectBox, setShowApplicationRejectBox] =
     useState(false);
 
-  // =====================================================
-  // FETCH APPLICATION
-  // =====================================================
-
   const fetchApplication = async () => {
     try {
       setLoading(true);
@@ -68,18 +64,12 @@ function AdminApplicationDetails() {
     }
   };
 
-  // =====================================================
-  // INITIAL LOAD
-  // =====================================================
-
+  
   useEffect(() => {
     fetchApplication();
   }, [applicationId]);
 
-  // =====================================================
-  // FORMAT CURRENCY
-  // =====================================================
-
+ 
   const formatCurrency = (value) => {
     if (
       value === null ||

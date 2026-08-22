@@ -535,270 +535,642 @@
 
 
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const { OAuth2Client } = require("google-auth-library");
-const crypto = require("crypto");
-const twilio = require("twilio");
+// const bcrypt = require("bcryptjs");
+// const jwt = require("jsonwebtoken");
+// const User = require("../models/User");
+// const { OAuth2Client } = require("google-auth-library");
+// const crypto = require("crypto");
+// const twilio = require("twilio");
 
 
-// ===============================
-// GOOGLE CLIENT
-// ===============================
+// // ===============================
+// // GOOGLE CLIENT
+// // ===============================
 
-const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID
-);
-
-
-// ===============================
-// TWILIO CLIENT
-// ===============================
-
-const twilioClient = twilio(
-  process.env.AccountSID,
-  process.env.AuthToken
-);
+// const googleClient = new OAuth2Client(
+//   process.env.GOOGLE_CLIENT_ID
+// );
 
 
-// ===============================
-// REGISTER
-// ===============================
+// // ===============================
+// // TWILIO CLIENT
+// // ===============================
 
-const register = async (req, res) => {
-  try {
-    const {
-      fullName,
-      email,
-      phone,
-      password,
-    } = req.body;
-
-    if (!fullName || !email || !phone || !password) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    const existingUser = await User.findOne({
-      $or: [
-        { email: normalizedEmail },
-        { phone: phone.trim() },
-      ],
-    });
-
-    if (existingUser) {
-      return res.status(409).json({
-        message: "Email or phone already registered",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(
-      password,
-      12
-    );
-
-    const user = await User.create({
-      fullName: fullName.trim(),
-      email: normalizedEmail,
-      phone: phone.trim(),
-      password: hashedPassword,
-
-      phoneVerified: false,
-      emailVerified: false,
-
-      kyc: {
-        completed: false,
-      },
-    });
-
-    return res.status(201).json({
-      message: "Registration successful",
-
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-
-        phoneVerified:
-          user.phoneVerified === true,
-
-        emailVerified:
-          user.emailVerified === true,
-
-        kycCompleted:
-          user.kyc?.completed === true,
-      },
-    });
-
-  } catch (error) {
-    console.error("Registration error:", error);
-
-    return res.status(500).json({
-      message: "Server error",
-    });
-  }
-};
+// const twilioClient = twilio(
+//   process.env.AccountSID,
+//   process.env.AuthToken
+// );
 
 
-// ===============================
-// LOGIN
-// ===============================
+// // ===============================
+// // REGISTER
+// // ===============================
 
-const login = async (req, res) => {
-  try {
-    console.log("========== LOGIN REQUEST ==========");
-    console.log("Request body:", req.body);
+// const register = async (req, res) => {
+//   try {
+//     const {
+//       fullName,
+//       email,
+//       phone,
+//       password,
+//     } = req.body;
 
-    const {
-      email,
-      password,
-    } = req.body;
+//     if (!fullName || !email || !phone || !password) {
+//       return res.status(400).json({
+//         message: "All fields are required",
+//       });
+//     }
 
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Email and password are required",
-      });
-    }
+//     const normalizedEmail = email.toLowerCase().trim();
 
-    const normalizedEmail = email
-      .toLowerCase()
-      .trim();
+//     const existingUser = await User.findOne({
+//       $or: [
+//         { email: normalizedEmail },
+//         { phone: phone.trim() },
+//       ],
+//     });
 
-    const user = await User.findOne({
-      email: normalizedEmail,
-    });
+//     if (existingUser) {
+//       return res.status(409).json({
+//         message: "Email or phone already registered",
+//       });
+//     }
 
-    if (!user) {
-      console.log(
-        "Login failed: user not found"
-      );
+//     const hashedPassword = await bcrypt.hash(
+//       password,
+//       12
+//     );
 
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
-    }
+//     const user = await User.create({
+//       fullName: fullName.trim(),
+//       email: normalizedEmail,
+//       phone: phone.trim(),
+//       password: hashedPassword,
 
-    // Google-created users may not have a password
-    if (!user.password) {
-      return res.status(401).json({
-        message:
-          "This account uses Google login. Please continue with Google.",
-      });
-    }
+//       phoneVerified: false,
+//       emailVerified: false,
 
-    const passwordMatch =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+//       kyc: {
+//         completed: false,
+//       },
+//     });
 
-    if (!passwordMatch) {
-      console.log(
-        "Login failed: incorrect password"
-      );
+//     return res.status(201).json({
+//       message: "Registration successful",
 
-      return res.status(401).json({
-        message: "Invalid email or password",
-      });
-    }
+//       user: {
+//         id: user._id,
+//         fullName: user.fullName,
+//         email: user.email,
+//         phone: user.phone,
+//         role: user.role,
 
-    if (!process.env.JWT_SECRET) {
-      console.error(
-        "JWT_SECRET is missing from .env"
-      );
+//         phoneVerified:
+//           user.phoneVerified === true,
 
-      return res.status(500).json({
-        message:
-          "JWT configuration is missing",
-      });
-    }
+//         emailVerified:
+//           user.emailVerified === true,
 
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
-    );
+//         kycCompleted:
+//           user.kyc?.completed === true,
+//       },
+//     });
 
-    console.log(
-      "Login successful:",
-      user.email
-    );
+//   } catch (error) {
+//     console.error("Registration error:", error);
 
-    return res.status(200).json({
-      message: "Login successful",
-
-      token,
-
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-
-        emailVerified:
-          user.emailVerified === true,
-
-        phoneVerified:
-          user.phoneVerified === true,
-
-        kycCompleted:
-          user.kyc?.completed === true,
-      },
-    });
-
-  } catch (error) {
-    console.error("Login error:", error);
-
-    return res.status(500).json({
-      message: "Server error",
-    });
-  }
-};
+//     return res.status(500).json({
+//       message: "Server error",
+//     });
+//   }
+// };
 
 
-// ===============================
-// GOOGLE LOGIN
-// ===============================
+// // ===============================
+// // LOGIN
+// // ===============================
+
+// const login = async (req, res) => {
+//   try {
+//     console.log("========== LOGIN REQUEST ==========");
+//     console.log("Request body:", req.body);
+
+//     const {
+//       email,
+//       password,
+//     } = req.body;
+
+//     if (!email || !password) {
+//       return res.status(400).json({
+//         message: "Email and password are required",
+//       });
+//     }
+
+//     const normalizedEmail = email
+//       .toLowerCase()
+//       .trim();
+
+//     const user = await User.findOne({
+//       email: normalizedEmail,
+//     });
+
+//     if (!user) {
+//       console.log(
+//         "Login failed: user not found"
+//       );
+
+//       return res.status(401).json({
+//         message: "Invalid email or password",
+//       });
+//     }
+
+//     // Google-created users may not have a password
+//     if (!user.password) {
+//       return res.status(401).json({
+//         message:
+//           "This account uses Google login. Please continue with Google.",
+//       });
+//     }
+
+//     const passwordMatch =
+//       await bcrypt.compare(
+//         password,
+//         user.password
+//       );
+
+//     if (!passwordMatch) {
+//       console.log(
+//         "Login failed: incorrect password"
+//       );
+
+//       return res.status(401).json({
+//         message: "Invalid email or password",
+//       });
+//     }
+
+//     if (!process.env.JWT_SECRET) {
+//       console.error(
+//         "JWT_SECRET is missing from .env"
+//       );
+
+//       return res.status(500).json({
+//         message:
+//           "JWT configuration is missing",
+//       });
+//     }
+
+//     const token = jwt.sign(
+//       {
+//         userId: user._id,
+//         role: user.role,
+//       },
+//       process.env.JWT_SECRET,
+//       {
+//         expiresIn: "1d",
+//       }
+//     );
+
+//     console.log(
+//       "Login successful:",
+//       user.email
+//     );
+
+//     return res.status(200).json({
+//       message: "Login successful",
+
+//       token,
+
+//       user: {
+//         id: user._id,
+//         fullName: user.fullName,
+//         email: user.email,
+//         phone: user.phone,
+//         role: user.role,
+
+//         emailVerified:
+//           user.emailVerified === true,
+
+//         phoneVerified:
+//           user.phoneVerified === true,
+
+//         kycCompleted:
+//           user.kyc?.completed === true,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.error("Login error:", error);
+
+//     return res.status(500).json({
+//       message: "Server error",
+//     });
+//   }
+// };
+
+
+// // ===============================
+// // GOOGLE LOGIN
+// // ===============================
+
+// const googleLogin = async (req, res) => {
+//   try {
+//     const { credential } = req.body;
+
+//     if (!credential) {
+//       return res.status(400).json({
+//         message:
+//           "Google credential is required",
+//       });
+//     }
+
+//     if (!process.env.GOOGLE_CLIENT_ID) {
+//       return res.status(500).json({
+//         message:
+//           "Google Client ID is not configured",
+//       });
+//     }
+
+//     const ticket =
+//       await googleClient.verifyIdToken({
+//         idToken: credential,
+//         audience:
+//           process.env.GOOGLE_CLIENT_ID,
+//       });
+
+//     const payload =
+//       ticket.getPayload();
+
+//     const {
+//       sub: googleId,
+//       email,
+//       name,
+//       email_verified,
+//     } = payload;
+
+//     if (!email || !email_verified) {
+//       return res.status(400).json({
+//         message:
+//           "Google email is not verified",
+//       });
+//     }
+
+//     const normalizedEmail =
+//       email.toLowerCase().trim();
+
+//     let user = await User.findOne({
+//       email: normalizedEmail,
+//     });
+
+//     if (!user) {
+//       user = await User.create({
+//         fullName:
+//           name || "Google User",
+
+//         email:
+//           normalizedEmail,
+
+//         googleId,
+
+//         emailVerified: true,
+
+//         phoneVerified: false,
+
+//         kyc: {
+//           completed: false,
+//         },
+//       });
+
+//     } else {
+
+//       if (!user.googleId) {
+//         user.googleId = googleId;
+//       }
+
+//       user.emailVerified = true;
+
+//       await user.save();
+//     }
+
+//     const token = jwt.sign(
+//       {
+//         userId: user._id,
+//         role: user.role,
+//       },
+//       process.env.JWT_SECRET,
+//       {
+//         expiresIn: "1d",
+//       }
+//     );
+
+//     return res.status(200).json({
+//       message:
+//         "Google login successful",
+
+//       token,
+
+//       user: {
+//         id: user._id,
+//         fullName: user.fullName,
+//         email: user.email,
+//         phone: user.phone,
+//         role: user.role,
+
+//         emailVerified: true,
+
+//         phoneVerified:
+//           user.phoneVerified === true,
+
+//         kycCompleted:
+//           user.kyc?.completed === true,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.error(
+//       "Google login error:",
+//       error
+//     );
+
+//     return res.status(401).json({
+//       message:
+//         "Google authentication failed",
+//     });
+//   }
+// };
+
+
+// // ===============================
+// // SEND PHONE OTP
+// // ===============================
+
+// const sendPhoneOtp = async (req, res) => {
+//   try {
+//     const {
+//       userId,
+//       phone,
+//     } = req.body;
+
+    
+
+//     console.log("User ID:", userId);
+//     console.log("Phone:", phone);
+
+//     if (!userId || !phone) {
+//       return res.status(400).json({
+//         message:
+//           "User ID and phone number are required",
+//       });
+//     }
+
+//     if (!/^\d{10}$/.test(phone)) {
+//       return res.status(400).json({
+//         message:
+//           "Enter a valid 10-digit phone number",
+//       });
+//     }
+
+//     const user =
+//       await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     const otp = crypto
+//       .randomInt(
+//         100000,
+//         1000000
+//       )
+//       .toString();
+
+//     user.phone = phone;
+
+//     user.phoneOtp = otp;
+
+//     user.phoneOtpExpires =
+//       new Date(
+//         Date.now() +
+//         5 * 60 * 1000
+//       );
+
+//     await user.save();
+
+//     console.log(
+//       "OTP generated:",
+//       otp
+//     );
+
+    
+//     if (
+//       process.env.TWILIO_PHONE_NUMBER &&
+//       process.env.AccountSID &&
+//       process.env.AuthToken
+//     ) {
+
+//       const formattedPhone =
+//         `+91${phone}`;
+
+//       const twilioMessage =
+//         await twilioClient.messages.create({
+//           body:
+//             `Your EZFINANZ verification OTP is ${otp}. It is valid for 5 minutes.`,
+
+//           from:
+//             process.env.TWILIO_PHONE_NUMBER,
+
+//           to:
+//             formattedPhone,
+//         });
+
+//       console.log(
+//         "OTP SMS sent:",
+//         twilioMessage.sid
+//       );
+
+//     } else {
+
+//       // Development mode
+//       console.log(
+//         "Twilio credentials missing."
+//       );
+
+//       console.log(
+//         "Development OTP:",
+//         otp
+//       );
+//     }
+
+//     return res.status(200).json({
+//       message:
+//         "OTP sent successfully",
+//     });
+
+//   } catch (error) {
+
+//     console.error(
+//       "Send OTP error:",
+//       error
+//     );
+
+//     return res.status(500).json({
+//       message:
+//         "Failed to send OTP",
+//     });
+//   }
+// };
+
+
+// // ===============================
+// // VERIFY PHONE OTP
+// // ===============================
+
+// const verifyPhoneOtp = async (req, res) => {
+//   try {
+
+//     const {
+//       userId,
+//       otp,
+//     } = req.body;
+
+//     if (!userId || !otp) {
+//       return res.status(400).json({
+//         message:
+//           "User ID and OTP are required",
+//       });
+//     }
+
+//     const user =
+//       await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     if (!user.phoneOtp) {
+//       return res.status(400).json({
+//         message:
+//           "No OTP has been generated",
+//       });
+//     }
+
+//     if (
+//       !user.phoneOtpExpires ||
+//       user.phoneOtpExpires < new Date()
+//     ) {
+
+//       user.phoneOtp = null;
+//       user.phoneOtpExpires = null;
+
+//       await user.save();
+
+//       return res.status(400).json({
+//         message:
+//           "OTP has expired",
+//       });
+//     }
+
+//     if (
+//       user.phoneOtp.toString() !==
+//       otp.toString()
+//     ) {
+
+//       return res.status(400).json({
+//         message: "Invalid OTP",
+//       });
+//     }
+
+//     user.phoneVerified = true;
+
+//     user.phoneOtp = null;
+
+//     user.phoneOtpExpires = null;
+
+//     await user.save();
+
+//     return res.status(200).json({
+//       message:
+//         "Phone verified successfully",
+
+//       phoneVerified: true,
+
+//       kycCompleted:
+//         user.kyc?.completed === true,
+//     });
+
+//   } catch (error) {
+
+//     console.error(
+//       "Verify OTP error:",
+//       error
+//     );
+
+//     return res.status(500).json({
+//       message:
+//         "Failed to verify OTP",
+//     });
+//   }
+// };
+
+
+// // ===============================
+// // EXPORT
+// // ===============================
+
+// module.exports = {
+//   register,
+//   login,
+//   googleLogin,
+//   sendPhoneOtp,
+//   verifyPhoneOtp,
+// };
+
+
+
+
+
 
 const googleLogin = async (req, res) => {
   try {
+    console.log("========== GOOGLE LOGIN ==========");
+
     const { credential } = req.body;
+
+    console.log("Credential received:", !!credential);
 
     if (!credential) {
       return res.status(400).json({
-        message:
-          "Google credential is required",
+        message: "Google credential is required",
       });
     }
 
-    if (!process.env.GOOGLE_CLIENT_ID) {
-      return res.status(500).json({
-        message:
-          "Google Client ID is not configured",
-      });
-    }
+    console.log(
+      "GOOGLE_CLIENT_ID exists:",
+      !!process.env.GOOGLE_CLIENT_ID
+    );
 
-    const ticket =
-      await googleClient.verifyIdToken({
-        idToken: credential,
-        audience:
-          process.env.GOOGLE_CLIENT_ID,
-      });
+    console.log(
+      "JWT_SECRET exists:",
+      !!process.env.JWT_SECRET
+    );
 
-    const payload =
-      ticket.getPayload();
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    console.log("Google token verified");
+
+    const payload = ticket.getPayload();
+
+    console.log("Google payload:", {
+      email: payload.email,
+      name: payload.name,
+      email_verified: payload.email_verified,
+    });
 
     const {
       sub: googleId,
@@ -809,38 +1181,54 @@ const googleLogin = async (req, res) => {
 
     if (!email || !email_verified) {
       return res.status(400).json({
-        message:
-          "Google email is not verified",
+        message: "Google email is not verified",
       });
     }
 
     const normalizedEmail =
       email.toLowerCase().trim();
 
+    console.log(
+      "Searching user:",
+      normalizedEmail
+    );
+
     let user = await User.findOne({
       email: normalizedEmail,
     });
 
+    console.log(
+      "Existing user:",
+      !!user
+    );
+
     if (!user) {
+
+      console.log(
+        "Creating new Google user..."
+      );
+
       user = await User.create({
-        fullName:
-          name || "Google User",
-
-        email:
-          normalizedEmail,
-
+        fullName: name || "Google User",
+        email: normalizedEmail,
         googleId,
-
         emailVerified: true,
-
         phoneVerified: false,
-
         kyc: {
           completed: false,
         },
       });
 
+      console.log(
+        "Google user created:",
+        user._id
+      );
+
     } else {
+
+      console.log(
+        "Updating existing user..."
+      );
 
       if (!user.googleId) {
         user.googleId = googleId;
@@ -849,7 +1237,25 @@ const googleLogin = async (req, res) => {
       user.emailVerified = true;
 
       await user.save();
+
+      console.log(
+        "Existing user updated"
+      );
     }
+
+    if (!process.env.JWT_SECRET) {
+      console.error(
+        "JWT_SECRET is missing"
+      );
+
+      return res.status(500).json({
+        message: "JWT configuration is missing",
+      });
+    }
+
+    console.log(
+      "Creating JWT..."
+    );
 
     const token = jwt.sign(
       {
@@ -862,9 +1268,12 @@ const googleLogin = async (req, res) => {
       }
     );
 
+    console.log(
+      "JWT created successfully"
+    );
+
     return res.status(200).json({
-      message:
-        "Google login successful",
+      message: "Google login successful",
 
       token,
 
@@ -886,244 +1295,16 @@ const googleLogin = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(
-      "Google login error:",
-      error
-    );
-
-    return res.status(401).json({
-      message:
-        "Google authentication failed",
-    });
-  }
-};
-
-
-// ===============================
-// SEND PHONE OTP
-// ===============================
-
-const sendPhoneOtp = async (req, res) => {
-  try {
-    const {
-      userId,
-      phone,
-    } = req.body;
-
-    
-
-    console.log("User ID:", userId);
-    console.log("Phone:", phone);
-
-    if (!userId || !phone) {
-      return res.status(400).json({
-        message:
-          "User ID and phone number are required",
-      });
-    }
-
-    if (!/^\d{10}$/.test(phone)) {
-      return res.status(400).json({
-        message:
-          "Enter a valid 10-digit phone number",
-      });
-    }
-
-    const user =
-      await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const otp = crypto
-      .randomInt(
-        100000,
-        1000000
-      )
-      .toString();
-
-    user.phone = phone;
-
-    user.phoneOtp = otp;
-
-    user.phoneOtpExpires =
-      new Date(
-        Date.now() +
-        5 * 60 * 1000
-      );
-
-    await user.save();
-
-    console.log(
-      "OTP generated:",
-      otp
-    );
-
-    
-    if (
-      process.env.TWILIO_PHONE_NUMBER &&
-      process.env.AccountSID &&
-      process.env.AuthToken
-    ) {
-
-      const formattedPhone =
-        `+91${phone}`;
-
-      const twilioMessage =
-        await twilioClient.messages.create({
-          body:
-            `Your EZFINANZ verification OTP is ${otp}. It is valid for 5 minutes.`,
-
-          from:
-            process.env.TWILIO_PHONE_NUMBER,
-
-          to:
-            formattedPhone,
-        });
-
-      console.log(
-        "OTP SMS sent:",
-        twilioMessage.sid
-      );
-
-    } else {
-
-      // Development mode
-      console.log(
-        "Twilio credentials missing."
-      );
-
-      console.log(
-        "Development OTP:",
-        otp
-      );
-    }
-
-    return res.status(200).json({
-      message:
-        "OTP sent successfully",
-    });
-
-  } catch (error) {
 
     console.error(
-      "Send OTP error:",
-      error
+      "========== GOOGLE LOGIN ERROR =========="
     );
+
+    console.error(error);
 
     return res.status(500).json({
-      message:
-        "Failed to send OTP",
+      message: "Google authentication failed",
+      error: error.message,
     });
   }
-};
-
-
-// ===============================
-// VERIFY PHONE OTP
-// ===============================
-
-const verifyPhoneOtp = async (req, res) => {
-  try {
-
-    const {
-      userId,
-      otp,
-    } = req.body;
-
-    if (!userId || !otp) {
-      return res.status(400).json({
-        message:
-          "User ID and OTP are required",
-      });
-    }
-
-    const user =
-      await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    if (!user.phoneOtp) {
-      return res.status(400).json({
-        message:
-          "No OTP has been generated",
-      });
-    }
-
-    if (
-      !user.phoneOtpExpires ||
-      user.phoneOtpExpires < new Date()
-    ) {
-
-      user.phoneOtp = null;
-      user.phoneOtpExpires = null;
-
-      await user.save();
-
-      return res.status(400).json({
-        message:
-          "OTP has expired",
-      });
-    }
-
-    if (
-      user.phoneOtp.toString() !==
-      otp.toString()
-    ) {
-
-      return res.status(400).json({
-        message: "Invalid OTP",
-      });
-    }
-
-    user.phoneVerified = true;
-
-    user.phoneOtp = null;
-
-    user.phoneOtpExpires = null;
-
-    await user.save();
-
-    return res.status(200).json({
-      message:
-        "Phone verified successfully",
-
-      phoneVerified: true,
-
-      kycCompleted:
-        user.kyc?.completed === true,
-    });
-
-  } catch (error) {
-
-    console.error(
-      "Verify OTP error:",
-      error
-    );
-
-    return res.status(500).json({
-      message:
-        "Failed to verify OTP",
-    });
-  }
-};
-
-
-// ===============================
-// EXPORT
-// ===============================
-
-module.exports = {
-  register,
-  login,
-  googleLogin,
-  sendPhoneOtp,
-  verifyPhoneOtp,
 };
