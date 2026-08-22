@@ -27,10 +27,7 @@ function EnterPhone() {
 
   const [loading, setLoading] = useState(false);
 
-  // ==========================================
-  // HANDLE PHONE CHANGE
-  // ==========================================
-
+  
   const handlePhoneChange = (e) => {
     const value = e.target.value
       .replace(/\D/g, "")
@@ -40,18 +37,14 @@ function EnterPhone() {
     setError("");
   };
 
-  // ==========================================
-  // SUBMIT PHONE
-  // ==========================================
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
 
-    // ==========================================
-    // CHECK USER
-    // ==========================================
+    
 
     if (!userId) {
       setError(
@@ -60,9 +53,7 @@ function EnterPhone() {
       return;
     }
 
-    // ==========================================
-    // VALIDATE PHONE
-    // ==========================================
+    
 
     if (phone.length !== 10) {
       setError(
@@ -74,9 +65,7 @@ function EnterPhone() {
     setLoading(true);
 
     try {
-      // ==========================================
-      // SAVE PHONE NUMBER
-      // ==========================================
+      
 
       const response = await axios.post(
         `${API_URL}/api/auth/add-phone`,
@@ -86,9 +75,7 @@ function EnterPhone() {
         }
       );
 
-      // ==========================================
-      // UPDATE LOCAL STORAGE
-      // ==========================================
+     
 
       const updatedUser = {
         ...user,
@@ -101,9 +88,8 @@ function EnterPhone() {
         JSON.stringify(updatedUser)
       );
 
-      // ==========================================
-      // GO TO PHONE VERIFICATION
-      // ==========================================
+      
+      
 
       navigate("/verify-phone");
 

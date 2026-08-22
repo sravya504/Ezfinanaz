@@ -28,30 +28,21 @@ function GoogleButton() {
         JSON.stringify(user)
       );
 
-      // ==========================================
-      // ADMIN
-      // ==========================================
+      
 
       if (user.role === "admin") {
         navigate("/admin/dashboard");
         return;
       }
 
-      // ==========================================
-      // CUSTOMER
-      // ==========================================
+      
 
       if (user.role === "customer") {
 
-        // Google verifies EMAIL.
-        // Phone must still be verified separately.
-        if (!user.phoneVerified) {
-          navigate("/verify-phone");
-          return;
-        }
+        
+        
 
-        // Phone already verified.
-        // Check KYC.
+        
         if (!user.kycCompleted) {
           navigate("/customer/kyc");
           return;

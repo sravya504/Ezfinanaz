@@ -21,9 +21,7 @@ function EMI() {
 
   const [error, setError] = useState("");
 
-  // ==========================================
-  // FETCH APPLICATION
-  // ==========================================
+ 
 
   useEffect(() => {
     const fetchApplication = async () => {

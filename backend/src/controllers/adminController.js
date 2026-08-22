@@ -1,8 +1,6 @@
 const LoanApplication = require("../models/LoanApplication");
 
-// =====================================================
-// GET ALL APPLICATIONS
-// =====================================================
+
 
 const getAllApplications = async (req, res) => {
   try {
@@ -28,9 +26,7 @@ const getAllApplications = async (req, res) => {
   }
 };
 
-// =====================================================
-// GET PENDING APPLICATIONS
-// =====================================================
+
 
 const getPendingApplications = async (req, res) => {
   try {
@@ -58,9 +54,7 @@ const getPendingApplications = async (req, res) => {
   }
 };
 
-// =====================================================
-// GET SINGLE APPLICATION
-// =====================================================
+
 
 const getApplicationById = async (req, res) => {
   try {
@@ -92,9 +86,7 @@ const getApplicationById = async (req, res) => {
   }
 };
 
-// =====================================================
-// APPROVE SELFIE / PHOTO
-// =====================================================
+
 
 const approveSelfie = async (req, res) => {
   try {
@@ -140,9 +132,7 @@ const approveSelfie = async (req, res) => {
   }
 };
 
-// =====================================================
-// REJECT SELFIE / PHOTO
-// =====================================================
+
 
 const rejectSelfie = async (req, res) => {
   try {
@@ -200,9 +190,6 @@ const rejectSelfie = async (req, res) => {
   }
 };
 
-// =====================================================
-// APPROVE ENTIRE APPLICATION
-// =====================================================
 
 const approveApplication = async (req, res) => {
   try {
@@ -266,9 +253,7 @@ const approveApplication = async (req, res) => {
   }
 };
 
-// =====================================================
-// REJECT ENTIRE APPLICATION
-// =====================================================
+
 
 const rejectApplication = async (req, res) => {
   try {
@@ -332,9 +317,7 @@ const rejectApplication = async (req, res) => {
   }
 };
 
-// =====================================================
-// EXPORT
-// =====================================================
+
 
 module.exports = {
   getAllApplications,

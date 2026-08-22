@@ -81,17 +81,17 @@ const checkEligibility = async (req, res) => {
       currentDebts,
     } = application.loanDetails;
 
-    // Convert annual income to monthly income
+    
     const monthlyIncome =
       incomeType === "annual" ? income / 12 : income;
 
-    // Debt-to-Income ratio
+  
     const debtToIncomeRatio =
       monthlyIncome > 0
         ? (currentDebts / monthlyIncome) * 100
         : 100;
 
-    // Credit score assessment
+  
     let creditScoreAssessment;
 
     if (creditScore >= 750) {
@@ -178,7 +178,7 @@ const calculateEMI = async (req, res) => {
       });
     }
 
-    // EMI calculation is allowed only after eligibility
+    
     if (
       !application.eligibility ||
       !["eligible", "partially_eligible"].includes(
@@ -208,28 +208,22 @@ const calculateEMI = async (req, res) => {
       });
     }
 
-    // Customer cannot select more than the eligible amount
+   
     if (amount > application.eligibility.eligibleLoanAmount) {
       return res.status(400).json({
         message: `Loan amount cannot exceed ₹${application.eligibility.eligibleLoanAmount}`,
       });
     }
 
-    /*
-      These are application assumptions because the document
-      does not prescribe exact values.
-
-      They can later be moved to a configuration file/database.
-    */
     const annualInterestRate = 12;
     const processingFeeRate = 2;
     const gstRate = 18;
     const otherCharges = 500;
 
-    // Monthly interest rate
+
     const monthlyRate = annualInterestRate / 12 / 100;
 
-    // EMI formula:
+    
     // EMI = P × r × (1+r)^n / ((1+r)^n - 1)
     const emi =
       amount === 0
@@ -251,12 +245,12 @@ const calculateEMI = async (req, res) => {
       (totalRepayment - amount).toFixed(2)
     );
 
-    // Processing fee
+   
     const processingFee = Number(
       ((amount * processingFeeRate) / 100).toFixed(2)
     );
 
-    // GST on processing fee
+    
     const gst = Number(
       ((processingFee * gstRate) / 100).toFixed(2)
     );
@@ -265,23 +259,13 @@ const calculateEMI = async (req, res) => {
       (processingFee + gst + otherCharges).toFixed(2)
     );
 
-    // Amount actually received by customer
+    
     const netDisbursementAmount = Number(
       (amount - totalCharges).toFixed(2)
     );
 
-    /*
-      IRR calculation
-
-      Initial cash flow:
-      +net disbursement
-
-      Future cash flows:
-      -monthly EMI
-
-      First calculate monthly IRR using Newton-Raphson,
-      then convert it to annual effective IRR.
-    */
+    
+    
     const calculateMonthlyIRR = (
       principal,
       payment,
@@ -374,7 +358,7 @@ const addBankAccount = async (req, res) => {
       bankName,
     } = req.body || {};
 
-    // Validate input
+   
     if (
       !accountHolderName ||
       !accountNumber ||
@@ -386,7 +370,7 @@ const addBankAccount = async (req, res) => {
       });
     }
 
-    // Find the user's application
+    
     const application = await LoanApplication.findOne({
       _id: applicationId,
       user: req.user.userId,
@@ -398,14 +382,14 @@ const addBankAccount = async (req, res) => {
       });
     }
 
-    // Bank account can be added only after EMI selection
+  
     if (application.currentStage !== "bank_account") {
       return res.status(400).json({
         message: "Bank account details cannot be added at this stage",
       });
     }
 
-    // Basic IFSC validation
+    
     const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
 
     if (!ifscRegex.test(ifscCode.toUpperCase())) {
@@ -414,7 +398,7 @@ const addBankAccount = async (req, res) => {
       });
     }
 
-    // Simulated bank verification
+ 
     const verified = true;
 
     application.bankDetails = {
@@ -426,7 +410,7 @@ const addBankAccount = async (req, res) => {
       verifiedAt: new Date(),
     };
 
-    // Move to declaration stage after successful verification
+    
     application.currentStage = "declaration";
 
     await application.save();

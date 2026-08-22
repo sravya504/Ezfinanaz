@@ -22,18 +22,14 @@ function Signup() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ==========================================
-  // PASSWORD VISIBILITY
-  // ==========================================
+  
 
   const [showPassword, setShowPassword] = useState(false);
 
   const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
 
-  // ==========================================
-  // HANDLE INPUT CHANGE
-  // ==========================================
+  
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -42,9 +38,7 @@ function Signup() {
     }));
   };
 
-  // ==========================================
-  // NORMAL SIGNUP
-  // ==========================================
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +46,7 @@ function Signup() {
     setError("");
     setSuccess("");
 
-    // Check passwords
+    
     if (
       formData.password !==
       formData.confirmPassword
@@ -98,18 +92,14 @@ function Signup() {
     }
   };
 
-  // ==========================================
-  // UI
-  // ==========================================
+  
 
   return (
     <div className="signup-page">
 
       <div className="signup-card">
 
-        {/* ==========================================
-            HEADER
-        ========================================== */}
+      
 
         <div className="signup-header">
 
@@ -121,13 +111,10 @@ function Signup() {
 
         </div>
 
-        {/* ==========================================
-            SIGNUP FORM
-        ========================================== */}
-
+       
         <form onSubmit={handleSubmit}>
 
-          {/* FULL NAME */}
+         
 
           <div className="form-group">
 
@@ -148,7 +135,7 @@ function Signup() {
 
           </div>
 
-          {/* EMAIL */}
+          
 
           <div className="form-group">
 
@@ -169,7 +156,7 @@ function Signup() {
 
           </div>
 
-          {/* PHONE */}
+          
 
           <div className="form-group">
 
@@ -190,8 +177,7 @@ function Signup() {
 
           </div>
 
-          {/* PASSWORD */}
-
+         
           <div className="form-group">
 
             <label htmlFor="password">
@@ -236,7 +222,7 @@ function Signup() {
 
           </div>
 
-          {/* CONFIRM PASSWORD */}
+          
 
           <div className="form-group">
 
@@ -284,7 +270,7 @@ function Signup() {
 
           </div>
 
-          {/* ERROR */}
+          
 
           {error && (
             <p className="signup-message error">
@@ -292,7 +278,7 @@ function Signup() {
             </p>
           )}
 
-          {/* SUCCESS */}
+        
 
           {success && (
             <p className="signup-message success">
@@ -300,7 +286,7 @@ function Signup() {
             </p>
           )}
 
-          {/* CREATE ACCOUNT */}
+          
 
           <button
             type="submit"
@@ -313,9 +299,7 @@ function Signup() {
 
         </form>
 
-        {/* ==========================================
-            GOOGLE SIGN UP
-        ========================================== */}
+        
 
         <div className="or-divider">
           <span>OR</span>
@@ -323,9 +307,7 @@ function Signup() {
 
         <GoogleButton />
 
-        {/* ==========================================
-            LOGIN LINK
-        ========================================== */}
+       
 
         <div className="login-link">
 

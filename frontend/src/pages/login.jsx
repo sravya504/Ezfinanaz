@@ -18,17 +18,10 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ==========================================
-  // SHOW / HIDE PASSWORD
-  // ==========================================
+  
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [showPassword, setShowPassword] =
-    useState(false);
-
-  // ==========================================
-  // HANDLE INPUT CHANGE
-  // ==========================================
-
+  
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -36,10 +29,7 @@ function Login() {
     }));
   };
 
-  // ==========================================
-  // LOGIN
-  // ==========================================
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,61 +44,42 @@ function Login() {
 
       const { token, user } = response.data;
 
-      // Save authentication
+      
       localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
-
-      // ==========================================
-      // ADMIN
-      // ==========================================
+      
 
       if (user.role === "admin") {
         navigate("/admin/dashboard");
         return;
       }
 
-      // ==========================================
-      // CUSTOMER
-      // ==========================================
+     
 
       if (user.role === "customer") {
 
-        // Phone verification
-        if (!user.phoneVerified) {
-          navigate("/verify-phone");
-          return;
-        }
-
-        // KYC
+       
         if (!user.kycCompleted) {
           navigate("/customer/kyc");
           return;
         }
 
-        // Dashboard
+        
         navigate("/customer/dashboard");
         return;
       }
 
-      // ==========================================
-      // UNKNOWN ROLE
-      // ==========================================
+      
 
       setError("Invalid user role.");
 
     } catch (error) {
-      console.error(
-        "Login error:",
-        error
-      );
+      console.error("Login error:", error);
 
       setError(
         error.response?.data?.message ||
-          "Login failed. Please check your email and password."
+        "Login failed. Please check your email and password."
       );
 
     } finally {
@@ -116,18 +87,12 @@ function Login() {
     }
   };
 
-  // ==========================================
-  // UI
-  // ==========================================
-
   return (
     <div className="login-page">
 
       <div className="login-card">
 
-        {/* ======================================
-            HEADER
-        ====================================== */}
+       
 
         <div className="login-header">
 
@@ -139,13 +104,11 @@ function Login() {
 
         </div>
 
-        {/* ======================================
-            LOGIN FORM
-        ====================================== */}
+       
 
         <form onSubmit={handleSubmit}>
 
-          {/* EMAIL */}
+          
 
           <div className="form-group">
 
@@ -166,7 +129,6 @@ function Login() {
 
           </div>
 
-          {/* PASSWORD */}
 
           <div className="form-group">
 
@@ -178,11 +140,7 @@ function Login() {
 
               <input
                 id="password"
-                type={
-                  showPassword
-                    ? "text"
-                    : "password"
-                }
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -195,9 +153,7 @@ function Login() {
                 type="button"
                 className="password-eye-button"
                 onClick={() =>
-                  setShowPassword(
-                    (prev) => !prev
-                  )
+                  setShowPassword((prev) => !prev)
                 }
                 aria-label={
                   showPassword
@@ -212,7 +168,7 @@ function Login() {
 
           </div>
 
-          {/* ERROR */}
+          
 
           {error && (
             <div className="error-message">
@@ -220,23 +176,19 @@ function Login() {
             </div>
           )}
 
-          {/* LOGIN BUTTON */}
+         
 
           <button
             type="submit"
             className="login-button"
             disabled={loading}
           >
-            {loading
-              ? "Logging in..."
-              : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
 
         </form>
 
-        {/* ======================================
-            GOOGLE LOGIN
-        ====================================== */}
+        
 
         <div className="or-divider">
           <span>OR</span>
@@ -244,10 +196,7 @@ function Login() {
 
         <GoogleButton />
 
-        {/* ======================================
-            SIGNUP
-        ====================================== */}
-
+        
         <div className="register-link">
 
           <span>

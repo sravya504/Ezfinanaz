@@ -17,9 +17,7 @@ function Eligibility() {
 
   const [error, setError] = useState("");
 
-  // ==============================
-  // FETCH APPLICATION
-  // ==============================
+  
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -68,9 +66,7 @@ function Eligibility() {
     fetchApplication();
   }, [navigate]);
 
-  // ==============================
-  // CHECK ELIGIBILITY
-  // ==============================
+
 
   const handleCheckEligibility = async () => {
     try {
@@ -117,17 +113,10 @@ function Eligibility() {
     }
   };
 
-  // ==============================
-  // CONTINUE TO EMI
-  // ==============================
-
+  
   const handleContinueToEMI = () => {
     navigate(`/customer/emi/${applicationId}`);
   };
-
-  // ==============================
-  // LOADING
-  // ==============================
 
   if (loading) {
     return (
@@ -139,9 +128,7 @@ function Eligibility() {
     );
   }
 
-  // ==============================
-  // ERROR
-  // ==============================
+  
 
   if (error && !application) {
     return (
@@ -166,10 +153,7 @@ function Eligibility() {
     );
   }
 
-  // ==============================
-  // MAIN UI
-  // ==============================
-
+ 
   return (
     <div className="eligibility-page">
 
@@ -248,7 +232,7 @@ function Eligibility() {
               <span>Current Debts</span>
 
               <strong>
-                ₹
+                
                 {application.loanDetails?.currentDebts?.toLocaleString(
                   "en-IN"
                 )}
@@ -266,7 +250,7 @@ function Eligibility() {
           </div>
         )}
 
-        {/* ERROR DURING CHECK */}
+        
 
         {error && (
           <p className="error-message">
@@ -274,9 +258,7 @@ function Eligibility() {
           </p>
         )}
 
-        {/* ==============================
-            NO ELIGIBILITY RESULT
-        ============================== */}
+       
 
         {!eligibility && (
           <div className="check-section">
@@ -301,9 +283,7 @@ function Eligibility() {
           </div>
         )}
 
-        {/* ==============================
-            ELIGIBILITY RESULT
-        ============================== */}
+        
 
         {eligibility && (
           <div className="result-section">
@@ -373,9 +353,7 @@ function Eligibility() {
 
             </div>
 
-            {/* ==============================
-                ELIGIBLE
-            ============================== */}
+            
 
             {(
               eligibility.result === "eligible" ||
@@ -398,9 +376,7 @@ function Eligibility() {
               </div>
             )}
 
-            {/* ==============================
-                NOT ELIGIBLE
-            ============================== */}
+           
 
             {eligibility.result === "not_eligible" && (
               <div className="not-eligible-message">
